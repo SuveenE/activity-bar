@@ -1,0 +1,312 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AAA00001 /* InputStatsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00001; };
+		AAA00002 /* StatsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00002; };
+		AAA00003 /* EventMonitors.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00003; };
+		AAA00004 /* SpeechDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00004; };
+		AAA00005 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00005; };
+		AAA00006 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00006; };
+		AAA00007 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00007; };
+		AAA00008 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BBB00008; };
+		AAA00009 /* FloatingPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00011; };
+		AAA00010 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = PKG00002 /* Sparkle */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		EEE00004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAA00010 /* Sparkle in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXFileReference section */
+		BBB00001 /* InputStatsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputStatsApp.swift; sourceTree = "<group>"; };
+		BBB00002 /* StatsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsStore.swift; sourceTree = "<group>"; };
+		BBB00003 /* EventMonitors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventMonitors.swift; sourceTree = "<group>"; };
+		BBB00004 /* SpeechDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechDetector.swift; sourceTree = "<group>"; };
+		BBB00005 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		BBB00006 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		BBB00007 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		BBB00008 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BBB00009 /* MacInputStats.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MacInputStats.entitlements; sourceTree = "<group>"; };
+		BBB00010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BBB00011 /* FloatingPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanel.swift; sourceTree = "<group>"; };
+		CCC00001 /* MacInputStats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacInputStats.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		DDD00001 = {
+			isa = PBXGroup;
+			children = (
+				DDD00002 /* MacInputStats */,
+				DDD00003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DDD00002 /* MacInputStats */ = {
+			isa = PBXGroup;
+			children = (
+				BBB00001 /* InputStatsApp.swift */,
+				BBB00007 /* Models.swift */,
+				BBB00002 /* StatsStore.swift */,
+				BBB00003 /* EventMonitors.swift */,
+				BBB00004 /* SpeechDetector.swift */,
+				BBB00005 /* DashboardView.swift */,
+				BBB00006 /* MenuBarView.swift */,
+				BBB00011 /* FloatingPanel.swift */,
+				BBB00008 /* Assets.xcassets */,
+				BBB00009 /* MacInputStats.entitlements */,
+				BBB00010 /* Info.plist */,
+			);
+			path = MacInputStats;
+			sourceTree = "<group>";
+		};
+		DDD00003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CCC00001 /* MacInputStats.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		EEE00001 /* MacInputStats */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FFF00003;
+			buildPhases = (
+				EEE00002 /* Sources */,
+				EEE00004 /* Frameworks */,
+				EEE00003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MacInputStats;
+			packageProductDependencies = (
+				PKG00002 /* Sparkle */,
+			);
+			productName = MacInputStats;
+			productReference = CCC00001;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		GGG00001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+			};
+			buildConfigurationList = FFF00001;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DDD00001;
+			packageReferences = (
+				PKG00001 /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
+			productRefGroup = DDD00003;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				EEE00001 /* MacInputStats */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		PKG00001 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		PKG00002 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = PKG00001 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+/* Begin PBXResourcesBuildPhase section */
+		EEE00003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAA00008 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EEE00002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAA00001 /* InputStatsApp.swift in Sources */,
+				AAA00002 /* StatsStore.swift in Sources */,
+				AAA00003 /* EventMonitors.swift in Sources */,
+				AAA00004 /* SpeechDetector.swift in Sources */,
+				AAA00005 /* DashboardView.swift in Sources */,
+				AAA00006 /* MenuBarView.swift in Sources */,
+				AAA00007 /* Models.swift in Sources */,
+				AAA00009 /* FloatingPanel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		FFF00004 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MacInputStats/MacInputStats.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MacInputStats/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Mac Input Stats Dev";
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "MacInputStats uses the microphone to detect when you are speaking and estimate talk time.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.suveene.MacInputStats.dev;
+				PRODUCT_NAME = MacInputStatsDev;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		FFF00005 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = MacInputStats/MacInputStats.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = MacInputStats/Info.plist;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "MacInputStats uses the microphone to detect when you are speaking and estimate talk time.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.suveene.MacInputStats;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		FFF00006 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		FFF00007 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FFF00001 /* Build configuration list for PBXProject "MacInputStats" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFF00006 /* Debug */,
+				FFF00007 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FFF00003 /* Build configuration list for PBXNativeTarget "MacInputStats" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FFF00004 /* Debug */,
+				FFF00005 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = GGG00001 /* Project object */;
+}

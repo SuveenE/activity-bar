@@ -1,0 +1,114 @@
+import Sparkle
+import SwiftUI
+
+@main
+struct InputStatsApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+    var body: some Scene {
+        Window("Dashboard", id: "dashboard") {
+            EmptyView()
+                .frame(width: 0, height: 0)
+        }
+        .defaultSize(width: 0, height: 0)
+
+        Settings { EmptyView() }
+    }
+}
+
+@MainActor
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    let store = StatsStore()
+    lazy var eventMonitors = EventMonitors(store: store)
+    lazy var micMonitor = SpeechDetector(store: store)
+    let updaterController = SPUStandardUpdaterController(
+        startingUpdater: true,
+        updaterDelegate: nil,
+        userDriverDelegate: nil
+    )
+
+    private var statusItem: NSStatusItem!
+    private var panel: FloatingPanel<AnyView>?
+
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        false
+    }
+
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        false
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        eventMonitors.stop()
+        micMonitor.stop()
+    }
+
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // Disable state restoration so Dashboard doesn't reappear
+        UserDefaults.standard.set(false, forKey: "NSQuitAlwaysKeepsWindows")
+
+        eventMonitors.start()
+        micMonitor.start()
+
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        if let button = statusItem.button {
+            button.image = NSImage(named: "MenuBarIcon")
+            button.image?.isTemplate = true
+            #if DEBUG
+            button.title = " DEV"
+            button.imagePosition = .imageLeading
+            #endif
+            button.action = #selector(togglePanel)
+            button.target = self
+        }
+
+        // Hide (don't close) any windows SwiftUI may have opened —
+        // a hidden window is needed for NSEvent global monitors to work
+        DispatchQueue.main.async {
+            for window in NSApplication.shared.windows {
+                guard window.level == .normal, !(window is FloatingPanel<AnyView>) else { continue }
+                window.orderOut(nil)
+            }
+        }
+    }
+
+    @objc private func togglePanel() {
+        if let panel, panel.isVisible {
+            closePanel()
+            return
+        }
+
+        guard let button = statusItem.button else { return }
+
+        let content = MenuBarView(
+            store: store,
+            micMonitor: micMonitor,
+            updater: updaterController.updater,
+            onClose: { [weak self] in self?.closePanel() }
+        )
+
+        if let panel {
+            panel.updateContent(AnyView(content))
+            panel.show(relativeTo: button)
+        } else {
+            let newPanel = FloatingPanel { AnyView(content) }
+            newPanel.onDismiss = { [weak self] in self?.setIconActive(false) }
+            newPanel.show(relativeTo: button)
+            panel = newPanel
+        }
+
+        setIconActive(true)
+        panel?.makeKey()
+    }
+
+    private func closePanel() {
+        panel?.dismiss()
+        setIconActive(false)
+    }
+
+    private func setIconActive(_ active: Bool) {
+        guard let button = statusItem.button else { return }
+        button.wantsLayer = true
+        button.layer?.backgroundColor = nil
+    }
+}

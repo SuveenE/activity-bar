@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>Mac Input Stats</string>
+	<key>CFBundleName</key>
+	<string>Mac Input Stats</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Mac Input Stats uses the microphone to detect when you are speaking and estimate talk time.</string>
+	<key>SUFeedURL</key>
+	<string>https://raw.githubusercontent.com/SuveenE/mac-input-stats/main/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>WQncZjWKyeC2WGl8o0wUgWf/c6vpXgp5Rbz/SsCgx/o=</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+</dict>
+</plist>
