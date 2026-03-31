@@ -86,7 +86,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let view = OnboardingView(eventMonitors: eventMonitors) {
+        let view = OnboardingView {
             UserDefaults.standard.set(true, forKey: "hasCompletedSetup")
             self.onboardingWindow?.close()
             self.onboardingWindow = nil

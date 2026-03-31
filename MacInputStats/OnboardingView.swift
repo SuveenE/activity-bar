@@ -2,11 +2,55 @@ import ApplicationServices
 import IOKit.hid
 import SwiftUI
 
+@MainActor
+final class PermissionChecker: ObservableObject {
+    @Published var accessibilityGranted = false
+    @Published var inputMonitoringGranted = false
+    private var timer: Timer?
+
+    func startChecking() {
+        check()
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                self?.check()
+            }
+        }
+    }
+
+    func stopChecking() {
+        timer?.invalidate()
+        timer = nil
+    }
+
+    private func check() {
+        let ax = testAccessibility()
+        let input = IOHIDCheckAccess(kIOHIDRequestTypeListenEvent) == kIOHIDAccessTypeGranted
+
+        if ax != accessibilityGranted {
+            accessibilityGranted = ax
+        }
+        if input != inputMonitoringGranted {
+            inputMonitoringGranted = input
+        }
+    }
+
+    /// Actually test Accessibility by querying another app's AX attributes.
+    /// AXIsProcessTrusted() can be stale, so this is more reliable.
+    private func testAccessibility() -> Bool {
+        // First check the fast API
+        if AXIsProcessTrusted() { return true }
+
+        // If the API says no, try an actual AX query as confirmation
+        guard let frontApp = NSWorkspace.shared.frontmostApplication else { return false }
+        let appElement = AXUIElementCreateApplication(frontApp.processIdentifier)
+        var value: AnyObject?
+        let result = AXUIElementCopyAttributeValue(appElement, kAXWindowsAttribute as CFString, &value)
+        return result == .success
+    }
+}
+
 struct OnboardingView: View {
-    @ObservedObject var eventMonitors: EventMonitors
-    @State private var accessibilityGranted = false
-    @State private var inputMonitoringGranted = false
-    @State private var pollTimer: Timer?
+    @StateObject private var checker = PermissionChecker()
 
     var onComplete: () -> Void
 
@@ -36,7 +80,7 @@ struct OnboardingView: View {
                     step: 1,
                     title: "Accessibility",
                     description: "Track clicks and scrolls",
-                    granted: accessibilityGranted,
+                    granted: checker.accessibilityGranted,
                     action: requestAccessibility
                 )
 
@@ -44,7 +88,7 @@ struct OnboardingView: View {
                     step: 2,
                     title: "Input Monitoring",
                     description: "Track keystrokes",
-                    granted: inputMonitoringGranted,
+                    granted: checker.inputMonitoringGranted,
                     action: requestInputMonitoring
                 )
             }
@@ -62,7 +106,7 @@ struct OnboardingView: View {
                 }
                 Spacer()
                 Button("Get Started") {
-                    pollTimer?.invalidate()
+                    checker.stopChecking()
                     onComplete()
                 }
                 .buttonStyle(.borderedProminent)
@@ -72,12 +116,12 @@ struct OnboardingView: View {
             .padding(.vertical, 16)
         }
         .frame(width: 400)
-        .onAppear { startPolling() }
-        .onDisappear { pollTimer?.invalidate() }
+        .onAppear { checker.startChecking() }
+        .onDisappear { checker.stopChecking() }
     }
 
     private var allGranted: Bool {
-        accessibilityGranted && inputMonitoringGranted
+        checker.accessibilityGranted && checker.inputMonitoringGranted
     }
 
     private func permissionRow(step: Int, title: String, description: String, granted: Bool, action: @escaping () -> Void) -> some View {
@@ -136,20 +180,6 @@ struct OnboardingView: View {
         }
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent") {
             NSWorkspace.shared.open(url)
-        }
-    }
-
-    private func checkPermissions() {
-        accessibilityGranted = AXIsProcessTrusted()
-        inputMonitoringGranted = IOHIDCheckAccess(kIOHIDRequestTypeListenEvent) == kIOHIDAccessTypeGranted
-    }
-
-    private func startPolling() {
-        checkPermissions()
-        pollTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            Task { @MainActor in
-                checkPermissions()
-            }
         }
     }
 }
