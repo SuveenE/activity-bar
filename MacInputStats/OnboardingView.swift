@@ -4,14 +4,11 @@ import SwiftUI
 
 struct OnboardingView: View {
     @ObservedObject var eventMonitors: EventMonitors
-    @State private var accessibilityGranted = AXIsProcessTrusted()
+    @State private var accessibilityGranted = false
+    @State private var inputMonitoringGranted = false
     @State private var pollTimer: Timer?
 
     var onComplete: () -> Void
-
-    private var inputMonitoringGranted: Bool {
-        eventMonitors.eventTapActive
-    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -142,15 +139,16 @@ struct OnboardingView: View {
         }
     }
 
+    private func checkPermissions() {
+        accessibilityGranted = AXIsProcessTrusted()
+        inputMonitoringGranted = IOHIDCheckAccess(kIOHIDRequestTypeListenEvent) == kIOHIDAccessTypeGranted
+    }
+
     private func startPolling() {
+        checkPermissions()
         pollTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             Task { @MainActor in
-                accessibilityGranted = AXIsProcessTrusted()
-                // Retry creating the event tap if permissions were just granted
-                if !eventMonitors.eventTapActive {
-                    eventMonitors.stop()
-                    eventMonitors.start()
-                }
+                checkPermissions()
             }
         }
     }

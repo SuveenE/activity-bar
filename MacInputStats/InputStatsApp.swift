@@ -90,6 +90,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             UserDefaults.standard.set(true, forKey: "hasCompletedSetup")
             self.onboardingWindow?.close()
             self.onboardingWindow = nil
+            // Restart monitors to pick up newly granted permissions
+            self.eventMonitors.stop()
+            self.eventMonitors.start()
         }
 
         let window = NSWindow(
