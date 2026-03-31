@@ -23,49 +23,17 @@ final class PermissionChecker: ObservableObject {
     }
 
     private func check() {
-        let ax = testAccessibility()
-        let input = testInputMonitoring()
+        let ax = AXIsProcessTrusted()
+        let input = IOHIDCheckAccess(kIOHIDRequestTypeListenEvent) == kIOHIDAccessTypeGranted
 
-        if ax != accessibilityGranted {
-            accessibilityGranted = ax
-        }
-        if input != inputMonitoringGranted {
-            inputMonitoringGranted = input
-        }
-    }
-
-    /// Test Accessibility by querying another app's AX attributes.
-    private func testAccessibility() -> Bool {
-        if AXIsProcessTrusted() { return true }
-
-        guard let frontApp = NSWorkspace.shared.frontmostApplication else { return false }
-        let appElement = AXUIElementCreateApplication(frontApp.processIdentifier)
-        var value: AnyObject?
-        let result = AXUIElementCopyAttributeValue(appElement, kAXWindowsAttribute as CFString, &value)
-        return result == .success
-    }
-
-    /// Test Input Monitoring by trying to open an HID manager.
-    /// IOHIDManagerOpen fails when Input Monitoring is not granted.
-    private func testInputMonitoring() -> Bool {
-        let api = IOHIDCheckAccess(kIOHIDRequestTypeListenEvent)
-        if api == kIOHIDAccessTypeGranted { return true }
-        if api == kIOHIDAccessTypeDenied { return false }
-
-        // If unknown, probe by opening an HID manager
-        let manager = IOHIDManagerCreate(kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone))
-        IOHIDManagerSetDeviceMatching(manager, [
-            kIOHIDDeviceUsagePageKey: kHIDPage_GenericDesktop,
-            kIOHIDDeviceUsageKey: kHIDUsage_GD_Keyboard,
-        ] as CFDictionary)
-        let result = IOHIDManagerOpen(manager, IOOptionBits(kIOHIDOptionsTypeNone))
-        IOHIDManagerClose(manager, IOOptionBits(kIOHIDOptionsTypeNone))
-        return result == kIOReturnSuccess
+        if ax != accessibilityGranted { accessibilityGranted = ax }
+        if input != inputMonitoringGranted { inputMonitoringGranted = input }
     }
 }
 
 struct OnboardingView: View {
     @StateObject private var checker = PermissionChecker()
+    @State private var grantTapped = (accessibility: false, inputMonitoring: false)
 
     var onComplete: () -> Void
 
@@ -96,7 +64,10 @@ struct OnboardingView: View {
                     title: "Accessibility",
                     description: "Track clicks and scrolls",
                     granted: checker.accessibilityGranted,
-                    action: requestAccessibility
+                    action: {
+                        grantTapped.accessibility = true
+                        requestAccessibility()
+                    }
                 )
 
                 permissionRow(
@@ -104,7 +75,10 @@ struct OnboardingView: View {
                     title: "Input Monitoring",
                     description: "Track keystrokes",
                     granted: checker.inputMonitoringGranted,
-                    action: requestInputMonitoring
+                    action: {
+                        grantTapped.inputMonitoring = true
+                        requestInputMonitoring()
+                    }
                 )
             }
             .padding(.horizontal, 20)
@@ -113,19 +87,38 @@ struct OnboardingView: View {
             Divider().padding(.horizontal, 16)
 
             // Footer
-            HStack {
-                if !allGranted {
-                    Text("Waiting for permissions...")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+            VStack(spacing: 8) {
+                if showRelaunchHint {
+                    HStack(spacing: 6) {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                        Text("Granted but not detected?")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Button("Relaunch") {
+                            relaunchApp()
+                        }
+                        .font(.caption.weight(.medium))
+                        .buttonStyle(.plain)
+                        .foregroundStyle(.blue)
+                    }
                 }
-                Spacer()
-                Button("Get Started") {
-                    checker.stopChecking()
-                    onComplete()
+
+                HStack {
+                    if !allGranted {
+                        Text("Waiting for permissions…")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("Get Started") {
+                        checker.stopChecking()
+                        onComplete()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(!allGranted)
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(!allGranted)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 16)
@@ -137,6 +130,12 @@ struct OnboardingView: View {
 
     private var allGranted: Bool {
         checker.accessibilityGranted && checker.inputMonitoringGranted
+    }
+
+    /// Show relaunch hint if user tapped Grant but permission still not detected after a few seconds
+    private var showRelaunchHint: Bool {
+        (grantTapped.accessibility && !checker.accessibilityGranted) ||
+        (grantTapped.inputMonitoring && !checker.inputMonitoringGranted)
     }
 
     private func permissionRow(step: Int, title: String, description: String, granted: Bool, action: @escaping () -> Void) -> some View {
@@ -196,5 +195,15 @@ struct OnboardingView: View {
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent") {
             NSWorkspace.shared.open(url)
         }
+    }
+
+    private func relaunchApp() {
+        let url = URL(fileURLWithPath: Bundle.main.resourcePath!)
+        let path = url.deletingLastPathComponent().deletingLastPathComponent().absoluteString
+        let task = Process()
+        task.launchPath = "/usr/bin/open"
+        task.arguments = ["-n", path, "--args", "--relaunch"]
+        try? task.run()
+        NSApp.terminate(nil)
     }
 }
