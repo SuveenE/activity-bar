@@ -48,12 +48,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Disable state restoration so Dashboard doesn't reappear
         UserDefaults.standard.set(false, forKey: "NSQuitAlwaysKeepsWindows")
 
-        // Show onboarding on first launch instead of starting monitors
-        if !UserDefaults.standard.bool(forKey: "hasCompletedSetup") {
-            showOnboarding()
-            return
-        }
-
         eventMonitors.start()
         micMonitor.start()
 
@@ -79,6 +73,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 window.orderOut(nil)
             }
         }
+
+        // Show onboarding on first launch
+        if !UserDefaults.standard.bool(forKey: "hasCompletedSetup") {
+            showOnboarding()
+        }
     }
 
     private func showOnboarding() {
@@ -87,10 +86,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let view = OnboardingView {
-            UserDefaults.standard.set(true, forKey: "hasCompletedSetup")
-            NSApplication.shared.terminate(nil)
-        }
+        let view = OnboardingView()
 
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 400, height: 300),
@@ -102,6 +98,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         window.contentView = NSHostingView(rootView: view)
         window.center()
         window.isReleasedWhenClosed = false
+        window.delegate = self
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
         onboardingWindow = window
@@ -150,5 +147,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard let button = statusItem.button else { return }
         button.wantsLayer = true
         button.layer?.backgroundColor = nil
+    }
+}
+
+extension AppDelegate: NSWindowDelegate {
+    func windowWillClose(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow,
+              window === onboardingWindow else { return }
+        UserDefaults.standard.set(true, forKey: "hasCompletedSetup")
+        onboardingWindow = nil
     }
 }

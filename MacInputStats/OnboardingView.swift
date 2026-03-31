@@ -2,8 +2,6 @@ import IOKit.hid
 import SwiftUI
 
 struct OnboardingView: View {
-    var onComplete: () -> Void
-
     var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 8) {
@@ -46,26 +44,9 @@ struct OnboardingView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
                 .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-
-                Text("After granting permission, the app will quit.\nReopen it to start tracking.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 20)
-
-            Divider().padding(.horizontal, 16)
-
-            HStack {
-                Spacer()
-                Button("Quit & Reopen Later") {
-                    onComplete()
-                }
-                .buttonStyle(.borderedProminent)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
         }
         .frame(width: 400)
     }
