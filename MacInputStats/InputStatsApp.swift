@@ -29,6 +29,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var statusItem: NSStatusItem!
     private var panel: FloatingPanel<AnyView>?
+    private var onboardingWindow: NSWindow?
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         false
@@ -46,6 +47,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Disable state restoration so Dashboard doesn't reappear
         UserDefaults.standard.set(false, forKey: "NSQuitAlwaysKeepsWindows")
+
+        // Show onboarding on first launch instead of starting monitors
+        if !UserDefaults.standard.bool(forKey: "hasCompletedSetup") {
+            showOnboarding()
+            return
+        }
 
         eventMonitors.start()
         micMonitor.start()
@@ -66,10 +73,38 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // a hidden window is needed for NSEvent global monitors to work
         DispatchQueue.main.async {
             for window in NSApplication.shared.windows {
-                guard window.level == .normal, !(window is FloatingPanel<AnyView>) else { continue }
+                guard window.level == .normal,
+                      !(window is FloatingPanel<AnyView>),
+                      window !== self.onboardingWindow else { continue }
                 window.orderOut(nil)
             }
         }
+    }
+
+    private func showOnboarding() {
+        if let existing = onboardingWindow, existing.isVisible {
+            existing.makeKeyAndOrderFront(nil)
+            return
+        }
+
+        let view = OnboardingView {
+            UserDefaults.standard.set(true, forKey: "hasCompletedSetup")
+            NSApplication.shared.terminate(nil)
+        }
+
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 400, height: 300),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "Setup"
+        window.contentView = NSHostingView(rootView: view)
+        window.center()
+        window.isReleasedWhenClosed = false
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+        onboardingWindow = window
     }
 
     @objc private func togglePanel() {
@@ -84,7 +119,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             store: store,
             micMonitor: micMonitor,
             updater: updaterController.updater,
-            onClose: { [weak self] in self?.closePanel() }
+            onClose: { [weak self] in self?.closePanel() },
+            onOpenSettings: {
+                if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent") {
+                    NSWorkspace.shared.open(url)
+                }
+            }
         )
 
         if let panel {
