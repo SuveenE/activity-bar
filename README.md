@@ -31,7 +31,7 @@
 2. Open the DMG and drag **Mac Input Stats** to Applications
 3. Launch **Mac Input Stats** and grant **Input Monitoring** when prompted
 
-   <img src="Input-monitoring-permissions.png" alt="Input Monitoring permission" width="480">
+   <img src="assets/Input-monitoring-permissions.png" alt="Input Monitoring permission" width="480">
 
 ## License
 
