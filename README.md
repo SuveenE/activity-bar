@@ -4,7 +4,7 @@
   <p align="center">
     A macOS menu bar app that helps you understand how you use your Mac
     <br />
-    through <b>typing</b>, <b>clicks</b>, <b>scrolling</b>, and <b>talk time</b>.
+    through <b>typing</b>, <b>clicks</b>, <b>scrolling</b>, and <b>voice input</b>.
     <br />
     <br />
     <a href="https://github.com/SuveenE/mac-input-stats/releases/latest">
