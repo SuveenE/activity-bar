@@ -6,12 +6,12 @@
     <br />
     <br />
     <a href="https://github.com/SuveenE/mac-input-stats/releases/latest">
-      <img src="https://img.shields.io/github/v/release/SuveenE/mac-input-stats?style=rounded&color=white&labelColor=000000&label=release" alt="Release Version" />
+      <img src="https://img.shields.io/github/v/release/SuveenE/mac-input-stats?style=rounded&color=orange&labelColor=000000&label=release" alt="Release Version" />
     </a>
     <a href="LICENSE">
       <img src="https://img.shields.io/badge/license-MIT-green?labelColor=000000" alt="MIT License" />
     </a>
-    <img src="https://img.shields.io/badge/macOS-14.0%2B-white?labelColor=000000" alt="macOS 14.0+" />
+    <img src="https://img.shields.io/badge/macOS-14.0%2B-f7a41d?labelColor=000000" alt="macOS 14.0+" />
   </p>
 </div>
 
@@ -27,14 +27,15 @@
 
 1. Download `MacInputStats-x.x.x.dmg` from the [latest GitHub Release](https://github.com/SuveenE/mac-input-stats/releases/latest)
 2. Open the DMG and drag **Mac Input Stats** to Applications
-3. Launch **Mac Input Stats** and grant permissions when prompted
+3. Launch **Mac Input Stats** and grant **Input Monitoring** when prompted
+
+   <img src="Input-monitoring-permissions.png" alt="Input Monitoring permission" width="480">
 
 ## Permissions
 
 | Permission | Why |
 |---|---|
-| **Accessibility** | Monitor keyboard, mouse, and scroll events system-wide |
-| **Input Monitoring** | Capture keystroke events via CGEvent tap |
+| **Input Monitoring** | Monitor keyboard, mouse, and scroll events system-wide |
 | **Microphone** | Detect speech activity and estimate talk time |
 
 ## License
