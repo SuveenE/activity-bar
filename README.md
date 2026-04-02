@@ -19,14 +19,6 @@
   <img src="assets/menubar-widget.png" alt="Menu bar widget" width="272">
 </div>
 
-## About
-
-- **Menu bar widget** with a floating panel for quick-glance daily stats
-- **Per-app breakdown** of keystrokes, clicks, scrolls, screen time, and talk time
-- **Talk time detection** using CoreAudio microphone activity monitoring
-- **Trend charts** with interactive 1d / 7d / 14d / 30d range picker
-- **Daily persistence** with a rolling 7-day history
-
 ## Install
 
 1. Download `MacInputStats-x.x.x.dmg` from the [latest GitHub Release](https://github.com/SuveenE/mac-input-stats/releases/latest)
@@ -34,6 +26,14 @@
 3. Launch **Mac Input Stats** and grant **Input Monitoring** when prompted
 
    <img src="assets/Input-monitoring-permissions.png" alt="Input Monitoring permission" width="480">
+
+## Features
+
+- **Menu bar widget** with a floating panel for quick-glance daily stats
+- **Per-app breakdown** of keystrokes, clicks, scrolls, screen time, and talk time
+- **Talk time detection** using CoreAudio microphone activity monitoring
+- **Trend charts** with interactive 1d / 7d / 14d / 30d range picker
+- **Daily persistence** with a rolling 7-day history
 
 ## License
 
