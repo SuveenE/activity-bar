@@ -336,14 +336,14 @@ struct MenuBarView: View {
                             .annotation(position: .top, spacing: 0, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
                                 VStack(spacing: 2) {
                                     Text(shortDate(day.date))
-                                        .font(.system(size: 7))
+                                        .font(.system(size: 9))
                                         .foregroundStyle(.primary.opacity(0.55))
                                     HStack(spacing: 6) {
                                         Text("\(day.keystrokes)").foregroundStyle(.blue)
                                         Text("\(day.pointerClicks)").foregroundStyle(.orange)
                                         Text("\(day.scrollEvents)").foregroundStyle(.green)
                                     }
-                                    .font(.system(size: 8).bold().monospacedDigit())
+                                    .font(.system(size: 10).bold().monospacedDigit())
                                 }
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 3)
@@ -386,13 +386,13 @@ struct MenuBarView: View {
                             if let label = value.as(String.self) {
                                 if shouldShowXLabel(label, in: dateLabels) {
                                     Text(label)
-                                        .font(.system(size: 7))
+                                        .font(.system(size: 9))
                                 }
                             }
                         }
                     } else {
                         AxisValueLabel()
-                            .font(.system(size: 8))
+                            .font(.system(size: 9))
                     }
                 }
             }
@@ -469,7 +469,7 @@ struct MenuBarView: View {
                     AxisValueLabel {
                         if let mins = value.as(Double.self) {
                             Text(talkAxisLabel(mins))
-                                .font(.system(size: 7))
+                                .font(.system(size: 9))
                         }
                     }
                 }
@@ -481,7 +481,7 @@ struct MenuBarView: View {
                         if let label = value.as(String.self) {
                             if !compactMode || shouldShowXLabel(label, in: labels) {
                                 Text(label)
-                                    .font(.system(size: 7))
+                                    .font(.system(size: 9))
                             }
                         }
                     }
