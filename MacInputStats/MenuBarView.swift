@@ -30,6 +30,56 @@ enum ChartRange: String, CaseIterable {
     var label: String { rawValue }
 }
 
+// MARK: - Fun Facts
+
+private enum FunFact {
+    static let secondsPerKeystroke = 0.25
+    static let secondsPerClick = 0.50
+    static let secondsPerScroll = 0.60
+    static let keysPerPage = 550
+    static let metersPerScroll = 3
+
+    /// Returns a fun fact string for the given stats, deterministically chosen per date.
+    static func forDay(_ stats: DailyStats) -> String? {
+        var facts: [String] = []
+
+        if stats.keystrokes > 0 {
+            let pages = Double(stats.keystrokes) / Double(keysPerPage)
+            if pages >= 1 {
+                facts.append("You typed about \(Int(pages.rounded())) page\(Int(pages.rounded()) == 1 ? "" : "s") worth of text today.")
+            }
+            let typingMins = (Double(stats.keystrokes) * secondsPerKeystroke) / 60
+            if typingMins >= 1 {
+                facts.append("Your fingers were busy for ~\(Int(typingMins.rounded())) min of pure typing.")
+            }
+        }
+
+        if stats.pointerClicks > 0 {
+            let clickMins = (Double(stats.pointerClicks) * secondsPerClick) / 60
+            if clickMins >= 1 {
+                facts.append("That's ~\(Int(clickMins.rounded())) min of pointing and clicking.")
+            }
+        }
+
+        if stats.scrollEvents > 0 {
+            let meters = stats.scrollEvents * metersPerScroll
+            if meters >= 1000 {
+                let km = Double(meters) / 1000.0
+                facts.append("You scrolled through ~\(String(format: "%.1f", km)) km of content.")
+            } else if meters >= 10 {
+                facts.append("You scrolled through ~\(meters) m of content.")
+            }
+        }
+
+        guard !facts.isEmpty else { return nil }
+        // Deterministic pick based on date string so it stays stable within the day
+        // (Swift's hashValue is randomized per launch, so use a simple djb2 hash)
+        let hash = stats.date.utf8.reduce(5381) { (($0 << 5) &+ $0) &+ Int($1) }
+        let index = abs(hash) % facts.count
+        return facts[index]
+    }
+}
+
 // MARK: - Main View
 
 struct MenuBarView: View {
@@ -118,6 +168,15 @@ struct MenuBarView: View {
             statRow(icon: micMonitor.micInUse ? "mic.fill" : "waveform",
                     value: liveTalkTime,
                     label: "Talk time")
+
+            if let fact = FunFact.forDay(store.today) {
+                Text(fact)
+                    .font(.caption)
+                    .foregroundStyle(.primary.opacity(0.55))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 8)
+                    .padding(.top, 6)
+            }
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
