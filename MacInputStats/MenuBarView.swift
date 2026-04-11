@@ -35,7 +35,7 @@ enum ChartRange: String, CaseIterable {
 private enum FunFact {
     static let secondsPerClick = 0.50
     static let keysPerPage = 550
-    static let pixelsPerScroll = 600
+    static let pixelsPerScroll = 250
     static let screenHeight = 1080
 
     /// Returns a fun fact string for the given stats, deterministically chosen per date.
