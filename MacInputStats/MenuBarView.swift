@@ -33,11 +33,10 @@ enum ChartRange: String, CaseIterable {
 // MARK: - Fun Facts
 
 private enum FunFact {
-    static let secondsPerKeystroke = 0.25
     static let secondsPerClick = 0.50
-    static let secondsPerScroll = 0.60
     static let keysPerPage = 550
-    static let metersPerScroll = 3
+    static let pixelsPerScroll = 600
+    static let screenHeight = 1080
 
     /// Returns a fun fact string for the given stats, deterministically chosen per date.
     static func forDay(_ stats: DailyStats) -> String? {
@@ -46,28 +45,23 @@ private enum FunFact {
         if stats.keystrokes > 0 {
             let pages = Double(stats.keystrokes) / Double(keysPerPage)
             if pages >= 1 {
-                facts.append("You typed about \(Int(pages.rounded())) page\(Int(pages.rounded()) == 1 ? "" : "s") worth of text today.")
-            }
-            let typingMins = (Double(stats.keystrokes) * secondsPerKeystroke) / 60
-            if typingMins >= 1 {
-                facts.append("Your fingers were busy for ~\(Int(typingMins.rounded())) min of pure typing.")
+                let formatted = NumberFormatter.localizedString(from: NSNumber(value: stats.keystrokes), number: .decimal)
+                facts.append("You typed \(formatted) keys today. That's like writing about \(Int(pages.rounded())) page\(Int(pages.rounded()) == 1 ? "" : "s").")
             }
         }
 
         if stats.pointerClicks > 0 {
             let clickMins = (Double(stats.pointerClicks) * secondsPerClick) / 60
             if clickMins >= 1 {
-                facts.append("That's ~\(Int(clickMins.rounded())) min of pointing and clicking.")
+                let formatted = NumberFormatter.localizedString(from: NSNumber(value: stats.pointerClicks), number: .decimal)
+                facts.append("You clicked \(formatted) times. That's like tapping your desk for about \(Int(clickMins.rounded())) minute\(Int(clickMins.rounded()) == 1 ? "" : "s").")
             }
         }
 
         if stats.scrollEvents > 0 {
-            let meters = stats.scrollEvents * metersPerScroll
-            if meters >= 1000 {
-                let km = Double(meters) / 1000.0
-                facts.append("You scrolled through ~\(String(format: "%.1f", km)) km of content.")
-            } else if meters >= 10 {
-                facts.append("You scrolled through ~\(meters) m of content.")
+            let screenfuls = (stats.scrollEvents * pixelsPerScroll) / screenHeight
+            if screenfuls >= 1 {
+                facts.append("You moved through about \(screenfuls) screenful\(screenfuls == 1 ? "" : "s") of content today.")
             }
         }
 
