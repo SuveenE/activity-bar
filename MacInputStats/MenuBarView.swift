@@ -165,12 +165,15 @@ struct MenuBarView: View {
 
             if let fact = FunFact.forDay(store.today) {
                 Text(fact)
-                    .font(.caption)
-                    .foregroundStyle(.primary.opacity(0.55))
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.primary.opacity(0.7))
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.horizontal, 8)
-                    .padding(.top, 6)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(.blue.opacity(0.08), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .padding(.horizontal, 4)
+                    .padding(.top, 8)
             }
         }
         .padding(.horizontal, 10)
