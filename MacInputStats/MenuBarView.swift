@@ -39,6 +39,7 @@ struct MenuBarView: View {
     var onClose: (() -> Void)?
     var onOpenSettings: (() -> Void)?
     @State private var hoveredDate: String?
+    @State private var hoveredTalkDate: String?
     @State private var expandedApp: String?
     @AppStorage("statsExpanded") private var statsExpanded = false
     @AppStorage("chartRange") private var chartRange: ChartRange = .sevenDays
@@ -455,12 +456,51 @@ struct MenuBarView: View {
             Chart {
                 ForEach(days) { day in
                     let d = chartLabel(day.date)
+                    let isHovered = hoveredTalkDate == d
                     BarMark(
                         x: .value("Date", d),
                         y: .value("Duration", day.talkDurationSeconds / 60)
                     )
-                    .foregroundStyle(.blue.opacity(0.4))
+                    .foregroundStyle(isHovered ? .blue.opacity(0.7) : .blue.opacity(0.4))
                     .cornerRadius(2)
+                    .annotation(position: .top, spacing: 2) {
+                        if isHovered, day.talkDurationSeconds > 0 {
+                            Text(shortDuration(day.talkDurationSeconds))
+                                .font(.system(size: 9).bold().monospacedDigit())
+                                .foregroundStyle(.primary)
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 2)
+                                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 4))
+                        }
+                    }
+                }
+            }
+            .chartOverlay { proxy in
+                GeometryReader { geo in
+                    Rectangle()
+                        .fill(.clear)
+                        .contentShape(Rectangle())
+                        .onContinuousHover { phase in
+                            switch phase {
+                            case .active(let location):
+                                let plotFrame = geo[proxy.plotFrame!]
+                                let x = location.x - plotFrame.origin.x
+                                var closest: String?
+                                var closestDist: CGFloat = .infinity
+                                for label in labels {
+                                    if let pos = proxy.position(forX: label) {
+                                        let dist = abs(pos - x)
+                                        if dist < closestDist {
+                                            closestDist = dist
+                                            closest = label
+                                        }
+                                    }
+                                }
+                                hoveredTalkDate = closest
+                            case .ended:
+                                hoveredTalkDate = nil
+                            }
+                        }
                 }
             }
             .chartYAxis {
