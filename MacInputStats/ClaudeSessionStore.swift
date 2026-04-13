@@ -11,6 +11,17 @@ final class ClaudeSessionStore: ObservableObject {
         orderedSessionIds.compactMap { sessions[$0] }
     }
 
+    /// Total tool calls across all active sessions.
+    var totalToolCalls: Int {
+        sessions.values.reduce(0) { $0 + $1.toolCallCount }
+    }
+
+    /// Total duration across all active sessions.
+    var totalDuration: TimeInterval {
+        let now = Date()
+        return sessions.values.reduce(0.0) { $0 + now.timeIntervalSince($1.startedAt) }
+    }
+
     /// Merged recent events across all sessions, sorted newest first.
     var recentActivity: [ActivityItem] {
         sessions.values
@@ -40,6 +51,9 @@ final class ClaudeSessionStore: ObservableObject {
             if let tool = event.tool {
                 session.lastTool = tool
             }
+            if event.event == .preToolUse {
+                session.toolCallCount += 1
+            }
             if let cwd = event.cwd, !cwd.isEmpty {
                 session.cwd = cwd
             }
@@ -53,6 +67,7 @@ final class ClaudeSessionStore: ObservableObject {
             session.cwd = event.cwd
             session.interactive = event.interactive ?? true
             session.eventCount = 1
+            session.toolCallCount = event.event == .preToolUse ? 1 : 0
             if let tool = event.tool {
                 session.lastTool = tool
             }
