@@ -81,6 +81,7 @@ private enum FunFact {
 struct MenuBarView: View {
     @ObservedObject var store: StatsStore
     @ObservedObject var micMonitor: SpeechDetector
+    @ObservedObject var claudeStore: ClaudeSessionStore
     var updater: SPUUpdater
     var onClose: (() -> Void)?
     var onOpenSettings: (() -> Void)?
@@ -103,6 +104,10 @@ struct MenuBarView: View {
             todayStats
             Divider().padding(.horizontal, 12)
             topAppsSection
+            if !claudeStore.activeSessions.isEmpty {
+                Divider().padding(.horizontal, 12)
+                claudeSection
+            }
             Divider().padding(.horizontal, 12)
             statsDisclosure
             if statsExpanded {
@@ -307,6 +312,31 @@ struct MenuBarView: View {
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(.primary.opacity(0.55))
         }
+    }
+
+    // MARK: - Claude Code
+
+    private var claudeSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Claude Code")
+                .font(.headline)
+                .padding(.horizontal, 6)
+                .padding(.bottom, 2)
+
+            VStack(spacing: 2) {
+                statRow(icon: "terminal",
+                        value: "\(claudeStore.activeSessions.count)",
+                        label: "Active sessions")
+                statRow(icon: "hammer",
+                        value: "\(claudeStore.totalToolCalls)",
+                        label: "Tool calls")
+                statRow(icon: "clock",
+                        value: AppStats.formatDuration(claudeStore.totalDuration),
+                        label: "Total duration")
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
     }
 
     // MARK: - Stats Disclosure
