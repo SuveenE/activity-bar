@@ -22,6 +22,7 @@
 		AAA00013 /* ClaudeSocketServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00014; };
 		AAA00014 /* HookInstaller.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00015; };
 		AAA00015 /* ClaudeSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00016; };
+		AAA00016 /* CursorSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00017; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +53,7 @@
 		BBB00014 /* ClaudeSocketServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeSocketServer.swift; sourceTree = "<group>"; };
 		BBB00015 /* HookInstaller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HookInstaller.swift; sourceTree = "<group>"; };
 		BBB00016 /* ClaudeSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeSessionStore.swift; sourceTree = "<group>"; };
+		BBB00017 /* CursorSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CursorSessionStore.swift; sourceTree = "<group>"; };
 		CCC00001 /* MacInputStats.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacInputStats.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -80,6 +82,7 @@
 				BBB00014 /* ClaudeSocketServer.swift */,
 				BBB00015 /* HookInstaller.swift */,
 				BBB00016 /* ClaudeSessionStore.swift */,
+				BBB00017 /* CursorSessionStore.swift */,
 				BBB00008 /* Assets.xcassets */,
 				BBB00009 /* MacInputStats.entitlements */,
 				BBB00010 /* Info.plist */,
@@ -197,6 +200,7 @@
 				AAA00013 /* ClaudeSocketServer.swift in Sources */,
 				AAA00014 /* HookInstaller.swift in Sources */,
 				AAA00015 /* ClaudeSessionStore.swift in Sources */,
+				AAA00016 /* CursorSessionStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
