@@ -4,7 +4,7 @@
   <p align="center">
     A macOS menu bar app that helps you understand how you use your Mac
     <br />
-    through <b>typing</b>, <b>clicks</b>, <b>scrolling</b>, <b>voice input</b>, and <img src="assets/claude-code-stats-badge.svg" alt="Claude Code stats" height="20" style="vertical-align: middle;" />.
+    through <b>typing</b>, <b>clicks</b>, <b>scrolling</b>, <b>voice input</b>, and <picture><img src="assets/claude-code-stats-badge.svg" alt="Claude Code stats" height="18" align="center" /></picture>.
     <br />
     <br />
     <a href="https://github.com/SuveenE/mac-input-stats/releases/latest">
