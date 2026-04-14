@@ -3,16 +3,16 @@
   <channel>
     <title>Mac Input Stats</title>
     <item>
-      <title>Version 1.0.8</title>
-      <sparkle:version>9</sparkle:version>
-      <sparkle:shortVersionString>1.0.8</sparkle:shortVersionString>
-      <pubDate>Tue, 14 Apr 2026 14:37:10 +0000</pubDate>
+      <title>Version 1.0.9</title>
+      <sparkle:version>10</sparkle:version>
+      <sparkle:shortVersionString>1.0.9</sparkle:shortVersionString>
+      <pubDate>Tue, 14 Apr 2026 15:00:01 +0000</pubDate>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
       <enclosure
-        url="https://github.com/SuveenE/mac-input-stats/releases/download/v1.0.8/MacInputStats.dmg"
-        length="3601341"
+        url="https://github.com/SuveenE/mac-input-stats/releases/download/v1.0.9/MacInputStats.dmg"
+        length="3601852"
         type="application/octet-stream"
-        sparkle:edSignature="hdADsXp7DGODDzhRgkARZf+1kw9eWPu644dd9i8aoodfHwlb3fShXKsAbZ19IlTFh6PNgfwpU86bdmLqk+O2Ag=="
+        sparkle:edSignature="9bpMcezm9ZQnkOqt/U2/itCox9IEdFVo9NHaJRiTq6Fgq8Y4UHDy49Ygn5NiA858zYMC2SCa+cDzn9TwxHk9CA=="
       />
     </item>
   </channel>
