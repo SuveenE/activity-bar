@@ -189,13 +189,13 @@ struct MenuBarView: View {
         .padding(.vertical, 8)
     }
 
-    private func statRow(icon: String, value: String, label: String) -> some View {
+    private func statRow(icon: String, value: String, label: String, tint: Color = .blue) -> some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(width: 26, height: 26)
-                .background(.blue, in: Circle())
+                .background(tint, in: Circle())
 
             Text(value)
                 .font(.body.weight(.semibold).monospacedDigit())
@@ -316,6 +316,8 @@ struct MenuBarView: View {
 
     // MARK: - Claude Code
 
+    private static let claudeColor = Color(red: 0xCB / 255.0, green: 0x64 / 255.0, blue: 0x41 / 255.0)
+
     private var claudeSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Claude Code")
@@ -324,15 +326,14 @@ struct MenuBarView: View {
                 .padding(.bottom, 2)
 
             VStack(spacing: 2) {
-                statRow(icon: "terminal",
-                        value: "\(claudeStore.activeSessions.count)",
-                        label: "Active sessions")
-                statRow(icon: "hammer",
-                        value: "\(claudeStore.totalToolCalls)",
-                        label: "Tool calls")
                 statRow(icon: "clock",
                         value: AppStats.formatDuration(claudeStore.totalDuration),
-                        label: "Total duration")
+                        label: "Duration today",
+                        tint: Self.claudeColor)
+                statRow(icon: "text.bubble",
+                        value: formatWordCount(claudeStore.totalWords),
+                        label: "Words to Claude",
+                        tint: Self.claudeColor)
             }
         }
         .padding(.horizontal, 16)
@@ -721,6 +722,13 @@ struct MenuBarView: View {
             return "\(m)m \(s)s"
         }
         return "\(s)s"
+    }
+
+    private func formatWordCount(_ count: Int) -> String {
+        if count >= 1000 {
+            return String(format: "%.1fk", Double(count) / 1000.0)
+        }
+        return "\(count)"
     }
 
     private func showQuitAlert() {
