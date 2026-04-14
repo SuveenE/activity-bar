@@ -1,90 +1,19 @@
 <?xml version="1.0" standalone="yes"?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
-    <channel>
-        <title>Mac Input Stats</title>
-        <item>
-            <title>Version 1.0.6</title>
-            <pubDate>Mon, 14 Apr 2026 00:00:00 +0000</pubDate>
-            <sparkle:version>7</sparkle:version>
-            <sparkle:shortVersionString>1.0.6</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure
-                url="https://github.com/SuveenE/mac-input-stats/releases/download/v1.0.6/MacInputStats-v1.0.6.dmg"
-                sparkle:edSignature="s5Si6jWCZiszNmaQIg9/Sa3P5N92Tb7Cr7h+Egk5AVpOlLmBQfSyQ6ALYQFrKpMfcGu3NVJMSfSQpq2g1ZmVDA=="
-                length="6748540"
-                type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 1.0.5</title>
-            <pubDate>Sun, 13 Apr 2026 00:00:00 +0000</pubDate>
-            <sparkle:version>6</sparkle:version>
-            <sparkle:shortVersionString>1.0.5</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure
-                url="https://github.com/SuveenE/mac-input-stats/releases/download/v1.0.5/MacInputStats-v1.0.5.dmg"
-                sparkle:edSignature="RfCxy4BjoA37zRHgWnYDK5Pv94uLSNUuQSY7RtMqrO328oGb/tteAKmazSdYxc2rB9LoC5hNdGl8LbLdEEZ/Aw=="
-                length="6740063"
-                type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 1.0.4</title>
-            <pubDate>Sat, 12 Apr 2026 00:00:00 +0000</pubDate>
-            <sparkle:version>5</sparkle:version>
-            <sparkle:shortVersionString>1.0.4</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure
-                url="https://github.com/SuveenE/mac-input-stats/releases/download/v1.0.4/MacInputStats-v1.0.4.dmg"
-                sparkle:edSignature="292Kz8LG1DfSihEtEHQHMh+HACesMPlMEXWdgcP23eKs5Fb1rqfyjFzBv4GuTFyuRTfK4iaCPvn2+bpXFsDNDg=="
-                length="6659796"
-                type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 1.0.3</title>
-            <pubDate>Sat, 12 Apr 2026 00:00:00 +0000</pubDate>
-            <sparkle:version>4</sparkle:version>
-            <sparkle:shortVersionString>1.0.3</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure
-                url="https://github.com/SuveenE/mac-input-stats/releases/download/v1.0.3/MacInputStats-v1.0.3.dmg"
-                sparkle:edSignature="g8oqHF3ZQhsvEfxsf6ErkiETA6GYKly9ykTlUxs/OuMh4euki01/rV84JiasxEhCxV76DQuO7vcKWYixH5r3Cg=="
-                length="6659221"
-                type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 1.0.2</title>
-            <pubDate>Sun, 12 Apr 2026 00:00:00 +0000</pubDate>
-            <sparkle:version>3</sparkle:version>
-            <sparkle:shortVersionString>1.0.2</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure
-                url="https://github.com/SuveenE/mac-input-stats/releases/download/v1.0.2/MacInputStats-v1.0.2.dmg"
-                sparkle:edSignature="LFjr0tJBgKxE5cADuD56y1ahEqDDFQG9rKdFFIVK2cDvuWIAlGgoQAEeoCFVXlaK3RS/VzdSmys6e2/vVVSWCA=="
-                length="3579224"
-                type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 1.0.1</title>
-            <pubDate>Tue, 01 Apr 2026 00:00:00 +0000</pubDate>
-            <sparkle:version>2</sparkle:version>
-            <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure
-                url="https://github.com/SuveenE/mac-input-stats/releases/download/v1.0.1/MacInputStats-v1.0.1.dmg"
-                sparkle:edSignature="mFC2l7H5WPDQw1MTC/01Pf5tXSHnx+XYsJFIkZ0LMb6gqSEfCnfWIxXQyWezhZe7LiIqCpm7yZTLWFqy/We6CA=="
-                length="3554896"
-                type="application/octet-stream" />
-        </item>
-        <item>
-            <title>Version 1.0.0</title>
-            <pubDate>Mon, 31 Mar 2026 00:00:00 +0000</pubDate>
-            <sparkle:version>1</sparkle:version>
-            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure
-                url="https://github.com/SuveenE/mac-input-stats/releases/download/v1.0.0/MacInputStats-v1.0.0.dmg"
-                sparkle:edSignature="1mfmGntPqx82Qjxp0/r862qoVg44zCDFUJ/xbSy4S5k5OXIQTK+2SxS6EFHBv2Q79eYmoULPHCagfDaM1EYkCw=="
-                length="3538338"
-                type="application/octet-stream" />
-        </item>
-    </channel>
+  <channel>
+    <title>Mac Input Stats</title>
+    <item>
+      <title>Version 1.0.7</title>
+      <sparkle:version>8</sparkle:version>
+      <sparkle:shortVersionString>1.0.7</sparkle:shortVersionString>
+      <pubDate>Tue, 14 Apr 2026 14:13:30 +0000</pubDate>
+      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+      <enclosure
+        url="https://github.com/SuveenE/mac-input-stats/releases/download/v1.0.7/MacInputStats.dmg"
+        length="3560047"
+        type="application/octet-stream"
+        sparkle:edSignature="zX7DZaH4Tck16jEt9ccDHXtMFFD70rZmskcFK2AZFctEjU76xujoHhXl0s2HOO3RovQMogVcbdnZ7NdYxyvNCA=="
+      />
+    </item>
+  </channel>
 </rss>
