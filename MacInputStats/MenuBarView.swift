@@ -82,6 +82,7 @@ struct MenuBarView: View {
     @ObservedObject var store: StatsStore
     @ObservedObject var micMonitor: SpeechDetector
     @ObservedObject var claudeStore: ClaudeSessionStore
+    @ObservedObject var cursorStore: CursorSessionStore
     var updater: SPUUpdater
     var onClose: (() -> Void)?
     var onOpenSettings: (() -> Void)?
@@ -105,6 +106,10 @@ struct MenuBarView: View {
             if claudeStore.totalDuration > 0 || claudeStore.totalWords > 0 || !claudeStore.activeSessions.isEmpty {
                 Divider().padding(.horizontal, 12)
                 claudeSection
+            }
+            if cursorStore.totalDuration > 0 || cursorStore.totalWords > 0 || !cursorStore.activeSessions.isEmpty {
+                Divider().padding(.horizontal, 12)
+                cursorSection
             }
             Divider().padding(.horizontal, 12)
             topAppsSection
@@ -336,6 +341,7 @@ struct MenuBarView: View {
     // MARK: - Claude Code
 
     private static let claudeColor = Color(red: 0xCB / 255.0, green: 0x64 / 255.0, blue: 0x41 / 255.0)
+    private static let cursorColor = Color(red: 0x00 / 255.0, green: 0x9B / 255.0, blue: 0xF5 / 255.0)
 
     private var claudeSection: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -345,33 +351,52 @@ struct MenuBarView: View {
                 .padding(.bottom, 2)
 
             HStack(spacing: 10) {
-                claudeStatCell(icon: "clock",
+                tintedStatCell(icon: "clock",
                                value: AppStats.formatDuration(claudeStore.totalDuration),
-                               label: "Execution duration")
-                claudeStatCell(icon: "text.bubble",
+                               label: "Execution duration",
+                               tint: Self.claudeColor)
+                tintedStatCell(icon: "text.bubble",
                                value: formatWordCount(claudeStore.totalWords),
-                               label: "Words to Claude")
+                               label: "Words to Claude",
+                               tint: Self.claudeColor)
             }
             .fixedSize(horizontal: false, vertical: true)
-
-            // TODO: re-enable project breakdown later
-            // let projects = claudeStore.todayTopProjects
-            // if !projects.isEmpty {
-            //     ...
-            // }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
     }
 
-    private func claudeStatCell(icon: String, value: String, label: String) -> some View {
+    private var cursorSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Cursor")
+                .font(.headline)
+                .padding(.horizontal, 6)
+                .padding(.bottom, 2)
+
+            HStack(spacing: 10) {
+                tintedStatCell(icon: "clock",
+                               value: AppStats.formatDuration(cursorStore.totalDuration),
+                               label: "Execution duration",
+                               tint: Self.cursorColor)
+                tintedStatCell(icon: "text.bubble",
+                               value: formatWordCount(cursorStore.totalWords),
+                               label: "Words to Cursor",
+                               tint: Self.cursorColor)
+            }
+            .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+    }
+
+    private func tintedStatCell(icon: String, value: String, label: String, tint: Color) -> some View {
         VStack(spacing: 6) {
             HStack(spacing: 6) {
                 Image(systemName: icon)
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(.white)
                     .frame(width: 26, height: 26)
-                    .background(Self.claudeColor, in: Circle())
+                    .background(tint, in: Circle())
 
                 Text(value)
                     .font(.system(size: 14, weight: .semibold).monospacedDigit())
