@@ -149,7 +149,7 @@ jobs:
           git fetch origin main
           git checkout main
           git add appcast.xml
-          git commit -m "Update appcast.xml for ${APP_VERSION}" || echo "No changes to commit"
+          git commit -m "Bump version to ${APP_VERSION} and update appcast" || echo "No changes to commit"
           git push origin main
 
       - name: Create GitHub Release
