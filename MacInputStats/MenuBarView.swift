@@ -344,15 +344,15 @@ struct MenuBarView: View {
                 .padding(.horizontal, 6)
                 .padding(.bottom, 2)
 
-            VStack(spacing: 2) {
-                statRow(icon: "clock",
-                        value: AppStats.formatDuration(claudeStore.totalDuration),
-                        label: "Duration today",
-                        tint: Self.claudeColor)
-                statRow(icon: "text.bubble",
-                        value: formatWordCount(claudeStore.totalWords),
-                        label: "Words to Claude",
-                        tint: Self.claudeColor)
+            HStack(spacing: 10) {
+                statCell(icon: "clock",
+                         value: AppStats.formatDuration(claudeStore.totalDuration),
+                         label: "Duration today",
+                         tint: Self.claudeColor)
+                statCell(icon: "text.bubble",
+                         value: formatWordCount(claudeStore.totalWords),
+                         label: "Words to Claude",
+                         tint: Self.claudeColor)
             }
         }
         .padding(.horizontal, 16)
