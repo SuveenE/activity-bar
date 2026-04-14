@@ -347,10 +347,10 @@ struct MenuBarView: View {
             HStack(spacing: 10) {
                 claudeStatCell(icon: "clock",
                                value: AppStats.formatDuration(claudeStore.totalDuration),
-                               label: "Execution\nduration")
+                               label: "Execution duration")
                 claudeStatCell(icon: "text.bubble",
                                value: formatWordCount(claudeStore.totalWords),
-                               label: "Words to\nClaude")
+                               label: "Words to Claude")
             }
             .fixedSize(horizontal: false, vertical: true)
         }
@@ -375,6 +375,7 @@ struct MenuBarView: View {
             Text(label)
                 .font(.system(size: 10))
                 .foregroundStyle(.primary.opacity(0.5))
+                .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, 10)
