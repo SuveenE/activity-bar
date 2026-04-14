@@ -102,12 +102,12 @@ struct MenuBarView: View {
         VStack(spacing: 0) {
             headerBar
             todayStats
-            Divider().padding(.horizontal, 12)
-            topAppsSection
             if claudeStore.totalDuration > 0 || claudeStore.totalWords > 0 || !claudeStore.activeSessions.isEmpty {
                 Divider().padding(.horizontal, 12)
                 claudeSection
             }
+            Divider().padding(.horizontal, 12)
+            topAppsSection
             Divider().padding(.horizontal, 12)
             statsDisclosure
             if statsExpanded {
@@ -354,19 +354,11 @@ struct MenuBarView: View {
             }
             .fixedSize(horizontal: false, vertical: true)
 
-            let projects = claudeStore.todayTopProjects
-            if !projects.isEmpty {
-                Text("Projects by Execution Time")
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(.primary.opacity(0.7))
-                    .padding(.horizontal, 6)
-                    .padding(.top, 4)
-
-                let maxDuration = projects.first?.stats.executionDuration ?? 1
-                ForEach(projects, id: \.name) { project in
-                    claudeProjectRow(name: project.name, stats: project.stats, maxDuration: maxDuration)
-                }
-            }
+            // TODO: re-enable project breakdown later
+            // let projects = claudeStore.todayTopProjects
+            // if !projects.isEmpty {
+            //     ...
+            // }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
