@@ -4,7 +4,7 @@
   <p align="center">
     A macOS menu bar app that tracks your <b>keystrokes</b>, <b>clicks</b>, <b>scrolling</b>, <b>voice input</b>,
     <br />
-    and <b>coding tool activity</b> — see how much time Claude Code and Cursor spend working for you.
+    and <b>coding tool activity</b> — see how much time <i>Claude Code</i> and <i>Cursor</i> spend working for you.
     <br />
     <br />
     <a href="https://github.com/SuveenE/mac-input-stats/releases/latest">
