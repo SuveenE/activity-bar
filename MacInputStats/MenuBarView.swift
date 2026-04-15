@@ -127,7 +127,6 @@ struct MenuBarView: View {
             Divider().padding(.horizontal, 12)
             statsDisclosure
             if statsExpanded {
-                trendModePicker
                 if trendMode == .codingTools {
                     codingToolsChart
                 } else {
@@ -489,53 +488,43 @@ struct MenuBarView: View {
     // MARK: - Stats Disclosure
 
     private var statsDisclosure: some View {
-        Button {
-            statsExpanded.toggle()
-        } label: {
-            HStack {
-                Text("Trends")
-                    .font(.headline)
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary.opacity(0.55))
-                    .rotationEffect(.degrees(statsExpanded ? 90 : 0))
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-    }
-
-    // MARK: - Trend Mode Picker
-
-    private var trendModePicker: some View {
-        HStack(spacing: 0) {
-            ForEach(TrendMode.allCases, id: \.self) { mode in
-                Button {
-                    withAnimation(.easeInOut(duration: 0.15)) {
-                        trendMode = mode
-                        hoveredDate = nil
-                    }
-                } label: {
-                    Text(mode.rawValue)
-                        .font(.caption.weight(.medium))
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .foregroundStyle(trendMode == mode ? .white : .primary.opacity(0.55))
-                        .background(
-                            trendMode == mode
-                                ? Color.blue
-                                : Color.clear,
-                            in: RoundedRectangle(cornerRadius: 5, style: .continuous)
-                        )
+        HStack {
+            Button {
+                statsExpanded.toggle()
+            } label: {
+                HStack(spacing: 6) {
+                    Text("Trends")
+                        .font(.headline)
+                    Image(systemName: "chevron.right")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary.opacity(0.55))
+                        .rotationEffect(.degrees(statsExpanded ? 90 : 0))
                 }
-                .buttonStyle(.plain)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+
+            if statsExpanded {
+                Spacer()
+                ForEach(TrendMode.allCases, id: \.self) { mode in
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            trendMode = mode
+                            hoveredDate = nil
+                        }
+                    } label: {
+                        Text(mode.rawValue)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(.primary.opacity(trendMode == mode ? 1 : 0.35))
+                    }
+                    .buttonStyle(.plain)
+                }
+            } else {
+                Spacer()
             }
         }
         .padding(.horizontal, 16)
-        .padding(.top, 6)
+        .padding(.vertical, 10)
     }
 
     // MARK: - Coding Tools Chart
