@@ -18,10 +18,8 @@
     <img src="https://img.shields.io/badge/macOS-14.0%2B-f7a41d?labelColor=000000" alt="macOS 14.0+" />
   </p>
   <br />
-  <table><tr>
-    <td><img src="assets/menubar-widget.png" alt="Menu bar widget" width="300"></td>
-    <td><img src="assets/cursor-stats.png" alt="Coding tool stats" width="420"></td>
-  </tr></table>
+  <img src="assets/menubar-widget.png" alt="Menu bar widget" height="500">
+  <img src="assets/cursor-stats.png" alt="Coding tool stats" height="500">
 </div>
 
 ## Install
