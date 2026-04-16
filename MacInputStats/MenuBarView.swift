@@ -370,22 +370,43 @@ struct MenuBarView: View {
     private static let codexColor = Color(red: 0x10 / 255.0, green: 0xA3 / 255.0, blue: 0x7F / 255.0)
 
     private var claudeSection: some View {
-        codingToolRow(name: "Claude Code", duration: claudeStore.totalDuration, tint: Self.claudeColor)
+        codingToolRow(
+            name: "Claude Code",
+            duration: claudeStore.totalDuration,
+            tint: Self.claudeColor,
+            assetName: "ClaudeCodeIcon",
+            iconSize: 11
+        )
     }
 
     private var cursorSection: some View {
-        codingToolRow(name: "Cursor", duration: cursorStore.totalDuration, tint: Self.cursorColor)
+        codingToolRow(
+            name: "Cursor",
+            duration: cursorStore.totalDuration,
+            tint: Self.cursorColor,
+            assetName: "CursorIcon",
+            iconSize: 12
+        )
     }
 
     private var codexSection: some View {
-        codingToolRow(name: "Codex", duration: codexStore.totalDuration, tint: Self.codexColor)
+        codingToolRow(
+            name: "Codex",
+            duration: codexStore.totalDuration,
+            tint: Self.codexColor,
+            assetName: "CodexIcon",
+            iconSize: 12
+        )
     }
 
-    private func codingToolRow(name: String, duration: TimeInterval, tint: Color) -> some View {
+    private func codingToolRow(name: String, duration: TimeInterval, tint: Color, assetName: String, iconSize: CGFloat) -> some View {
         HStack(spacing: 8) {
-            Image(systemName: "clock")
-                .font(.system(size: 10, weight: .semibold))
+            Image(assetName)
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
                 .foregroundStyle(.white)
+                .frame(width: iconSize, height: iconSize)
                 .frame(width: 22, height: 22)
                 .background(tint, in: Circle())
 
