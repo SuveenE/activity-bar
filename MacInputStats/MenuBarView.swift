@@ -375,7 +375,7 @@ struct MenuBarView: View {
             duration: claudeStore.totalDuration,
             tint: Self.claudeColor,
             assetName: "ClaudeCodeIcon",
-            iconSize: 13
+            iconSize: 14
         )
     }
 
@@ -385,7 +385,7 @@ struct MenuBarView: View {
             duration: cursorStore.totalDuration,
             tint: Self.cursorColor,
             assetName: "CursorIcon",
-            iconSize: 14
+            iconSize: 15
         )
     }
 
@@ -395,7 +395,7 @@ struct MenuBarView: View {
             duration: codexStore.totalDuration,
             tint: Self.codexColor,
             assetName: "CodexIcon",
-            iconSize: 14
+            iconSize: 15
         )
     }
 
@@ -407,7 +407,7 @@ struct MenuBarView: View {
                 .scaledToFit()
                 .foregroundStyle(.white)
                 .frame(width: iconSize, height: iconSize)
-                .frame(width: 24, height: 24)
+                .frame(width: 26, height: 26)
                 .background(tint, in: Circle())
 
             Text(name)
