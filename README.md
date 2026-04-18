@@ -23,6 +23,7 @@
     &nbsp;
     <img src="assets/cursor-stats.png" alt="Coding tool stats" height="400">
   </p>
+  <p><em>No telemetry, everything stays local.</em></p>
 </div>
 
 ## Install
