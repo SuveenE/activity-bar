@@ -43,7 +43,7 @@
 - **Trend charts** with interactive 1d / 7d / 14d / 30d range picker
 - **Daily persistence** with a rolling 7-day history
 
-## Coding Tool Stats
+## How It Works
 
 During installation, Activity Bar registers hooks for Claude Code, Cursor, and Codex. When these tools emit events (tool use, prompts, session start/end), the hook scripts send JSON payloads to a local Unix socket. Activity Bar parses these events and calculates stats like execution time and tool call counts. No telemetry or usage data is sent to any server. Everything is computed and stored on your machine.
 
