@@ -149,6 +149,9 @@ struct MenuBarView: View {
         }
         .frame(width: panelWidth)
         .background(.regularMaterial, in: PanelShape())
+        .background {
+            PanelShape().fill(Color.black.opacity(0.85))
+        }
         .overlay {
             PanelShape()
                 .stroke(Color.black.opacity(0.5), lineWidth: 1)
