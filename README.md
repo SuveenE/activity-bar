@@ -45,7 +45,7 @@
 
 ## Coding Tool Stats
 
-During installation, Activity Bar registers hooks for Claude Code, Cursor, and Codex. When these tools emit events — such as tool use, prompts, or session start/end — the hook scripts send JSON payloads to a local Unix socket. Activity Bar parses these events and calculates stats like execution time and tool call counts. No telemetry or usage data is sent to any server — everything is computed and stored on your machine.
+During installation, Activity Bar registers hooks for Claude Code, Cursor, and Codex. When these tools emit events (tool use, prompts, session start/end), the hook scripts send JSON payloads to a local Unix socket. Activity Bar parses these events and calculates stats like execution time and tool call counts. No telemetry or usage data is sent to any server. Everything is computed and stored on your machine.
 
 ## Data Storage
 
