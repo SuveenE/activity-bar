@@ -53,15 +53,6 @@ struct MonthlyStatsView: View {
 
     private var header: some View {
         HStack {
-            Spacer()
-            VStack(spacing: 2) {
-                Text("Last 30 Days")
-                    .font(.headline)
-                Text(dateRangeLabel)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
             Button {
                 onClose?()
             } label: {
@@ -72,6 +63,15 @@ struct MonthlyStatsView: View {
                     .background(.primary.opacity(0.08), in: Circle())
             }
             .buttonStyle(.plain)
+            Spacer()
+            VStack(spacing: 2) {
+                Text("Last 30 Days")
+                    .font(.headline)
+                Text(dateRangeLabel)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
         }
     }
 
