@@ -1,5 +1,23 @@
 import SwiftUI
 
+enum StatsRange: String, CaseIterable {
+    case sevenDays = "7d"
+    case thirtyDays = "30d"
+    case ninetyDays = "90d"
+    case allTime = "All"
+
+    var dayCount: Int {
+        switch self {
+        case .sevenDays: return 7
+        case .thirtyDays: return 30
+        case .ninetyDays: return 90
+        case .allTime: return 9999
+        }
+    }
+
+    var label: String { rawValue }
+}
+
 struct MonthlyStatsView: View {
     @ObservedObject var store: StatsStore
     @ObservedObject var claudeStore: ClaudeSessionStore
@@ -7,20 +25,22 @@ struct MonthlyStatsView: View {
     @ObservedObject var codexStore: CodexSessionStore
     var onClose: (() -> Void)?
 
-    private var inputDays: [DailyStats] { store.recentDays(count: 30) }
+    @State private var selectedRange: StatsRange = .allTime
+
+    private var inputDays: [DailyStats] { store.recentDays(count: selectedRange.dayCount) }
     private var totalKeystrokes: Int { inputDays.reduce(0) { $0 + $1.keystrokes } }
     private var totalClicks: Int { inputDays.reduce(0) { $0 + $1.pointerClicks } }
     private var totalScrolls: Int { inputDays.reduce(0) { $0 + $1.scrollEvents } }
     private var totalTalkSeconds: Double { inputDays.reduce(0) { $0 + $1.talkDurationSeconds } }
 
     private var totalClaudeDuration: Double {
-        claudeStore.recentDays(count: 30).reduce(0) { $0 + $1.executionDuration }
+        claudeStore.recentDays(count: selectedRange.dayCount).reduce(0) { $0 + $1.executionDuration }
     }
     private var totalCursorDuration: Double {
-        cursorStore.recentDays(count: 30).reduce(0) { $0 + $1.executionDuration }
+        cursorStore.recentDays(count: selectedRange.dayCount).reduce(0) { $0 + $1.executionDuration }
     }
     private var totalCodexDuration: Double {
-        codexStore.recentDays(count: 30).reduce(0) { $0 + $1.executionDuration }
+        codexStore.recentDays(count: selectedRange.dayCount).reduce(0) { $0 + $1.executionDuration }
     }
 
     private var hasAnyAI: Bool {
@@ -34,6 +54,7 @@ struct MonthlyStatsView: View {
     var body: some View {
         VStack(spacing: 16) {
             header
+            rangePicker
             inputGrid
             if hasAnyAI {
                 aiSection
@@ -41,12 +62,13 @@ struct MonthlyStatsView: View {
         }
         .padding(16)
         .frame(width: 302)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
+            RoundedRectangle(cornerRadius: 6, style: .continuous)
                 .stroke(Color.black.opacity(0.5), lineWidth: 1)
         }
         .shadow(color: .black.opacity(0.2), radius: 10, y: 4)
+        .animation(.easeInOut(duration: 0.2), value: selectedRange)
     }
 
     // MARK: - Header
@@ -57,15 +79,15 @@ struct MonthlyStatsView: View {
                 onClose?()
             } label: {
                 Image(systemName: "xmark")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                    .frame(width: 20, height: 20)
-                    .background(.primary.opacity(0.08), in: Circle())
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.primary.opacity(0.6))
+                    .frame(width: 22, height: 22)
+                    .background(.primary.opacity(0.12), in: Circle())
             }
             .buttonStyle(.plain)
             Spacer()
             VStack(spacing: 2) {
-                Text("Last 30 Days")
+                Text("All Time Stats")
                     .font(.headline)
                 Text(dateRangeLabel)
                     .font(.caption)
@@ -79,6 +101,29 @@ struct MonthlyStatsView: View {
         let days = inputDays
         guard let first = days.first, let last = days.last else { return "" }
         return "\(formatDate(first.date)) - \(formatDate(last.date))"
+    }
+
+    // MARK: - Range Picker
+
+    private var rangePicker: some View {
+        HStack(spacing: 4) {
+            ForEach(StatsRange.allCases, id: \.self) { range in
+                Button {
+                    selectedRange = range
+                } label: {
+                    Text(range.label)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(selectedRange == range ? .white : .primary.opacity(0.55))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(
+                            selectedRange == range ? Color.blue : Color.primary.opacity(0.06),
+                            in: Capsule()
+                        )
+                }
+                .buttonStyle(.plain)
+            }
+        }
     }
 
     // MARK: - Input Stats Grid
