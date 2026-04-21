@@ -1031,7 +1031,7 @@ struct MenuBarView: View {
             Button {
                 onOpenMonthlyStats?()
             } label: {
-                Text("Monthly")
+                Text("All Time")
                     .font(.subheadline)
                     .foregroundStyle(.primary.opacity(0.55))
             }
