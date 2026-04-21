@@ -36,6 +36,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var panel: FloatingPanel<AnyView>?
     private var onboardingWindow: NSWindow?
+    private var monthlySidePanel: NSPanel?
+    private var monthlySideClickMonitor: Any?
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         false
@@ -89,7 +91,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             for window in NSApplication.shared.windows {
                 guard window.level == .normal,
                       !(window is FloatingPanel<AnyView>),
-                      window !== self.onboardingWindow else { continue }
+                      window !== self.onboardingWindow,
+                      window !== self.monthlySidePanel else { continue }
                 window.orderOut(nil)
             }
         }
@@ -124,6 +127,79 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         onboardingWindow = window
     }
 
+    private func toggleMonthlyStats() {
+        if let existing = monthlySidePanel, existing.isVisible {
+            dismissMonthlySidePanel()
+            return
+        }
+
+        guard let mainPanel = panel, mainPanel.isVisible else { return }
+
+        let view = MonthlyStatsView(
+            store: store,
+            claudeStore: claudeStore,
+            cursorStore: cursorStore,
+            codexStore: codexStore,
+            onClose: { [weak self] in self?.dismissMonthlySidePanel() }
+        )
+
+        let hosting = NSHostingView(rootView: view)
+        let fittingSize = hosting.fittingSize
+
+        let sidePanel = NSPanel(
+            contentRect: NSRect(x: 0, y: 0, width: fittingSize.width, height: fittingSize.height),
+            styleMask: [.borderless, .nonactivatingPanel],
+            backing: .buffered,
+            defer: false
+        )
+        sidePanel.isFloatingPanel = true
+        sidePanel.level = mainPanel.level
+        sidePanel.isOpaque = false
+        sidePanel.backgroundColor = .clear
+        sidePanel.hasShadow = false
+        sidePanel.isMovable = false
+        sidePanel.isReleasedWhenClosed = false
+
+        sidePanel.contentView = hosting
+
+        // Position to the left of the main panel with a small gap
+        let mainFrame = mainPanel.frame
+        let gap: CGFloat = 8
+        let x = mainFrame.minX - fittingSize.width - gap
+        let y = mainFrame.maxY - fittingSize.height
+        sidePanel.setFrame(NSRect(x: x, y: y, width: fittingSize.width, height: fittingSize.height), display: true)
+
+        sidePanel.alphaValue = 0
+        sidePanel.orderFront(nil)
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = 0.2
+            ctx.timingFunction = CAMediaTimingFunction(name: .easeOut)
+            sidePanel.animator().alphaValue = 1
+        }
+
+        monthlySidePanel = sidePanel
+
+        // Dismiss when clicking outside both panels
+        monthlySideClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
+            self?.dismissMonthlySidePanel()
+        }
+    }
+
+    private func dismissMonthlySidePanel() {
+        if let monitor = monthlySideClickMonitor {
+            NSEvent.removeMonitor(monitor)
+            monthlySideClickMonitor = nil
+        }
+        guard let sidePanel = monthlySidePanel else { return }
+        NSAnimationContext.runAnimationGroup({ ctx in
+            ctx.duration = 0.15
+            ctx.timingFunction = CAMediaTimingFunction(name: .easeIn)
+            sidePanel.animator().alphaValue = 0
+        }, completionHandler: {
+            sidePanel.orderOut(nil)
+        })
+    }
+
     @objc private func togglePanel() {
         if let panel, panel.isVisible {
             closePanel()
@@ -144,7 +220,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ListenEvent") {
                     NSWorkspace.shared.open(url)
                 }
-            }
+            },
+            onOpenMonthlyStats: { [weak self] in self?.toggleMonthlyStats() }
         )
 
         if let panel {
@@ -162,6 +239,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func closePanel() {
+        dismissMonthlySidePanel()
         panel?.dismiss()
         setIconActive(false)
     }
