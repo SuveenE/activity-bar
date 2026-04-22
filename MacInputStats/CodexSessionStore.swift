@@ -51,7 +51,13 @@ final class CodexSessionStore: ObservableObject {
     }
 
     var totalDuration: TimeInterval {
-        let persisted = days[todayKey]?.executionDuration ?? 0
+        duration(for: todayKey)
+    }
+
+    func duration(for dateKey: String) -> TimeInterval {
+        let persisted = days[dateKey]?.executionDuration ?? 0
+        let isToday = dateKey == todayKey
+        guard isToday else { return persisted }
         let now = Date()
         let inProgress = sessions.values.reduce(0.0) { total, session in
             guard let activeStart = session.activeStartedAt else { return total }
