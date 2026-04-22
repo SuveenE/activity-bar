@@ -99,20 +99,57 @@ struct MenuBarView: View {
     @AppStorage("statsExpanded") private var statsExpanded = false
     @AppStorage("chartRange") private var chartRange: ChartRange = .sevenDays
     @State private var trendMode: TrendMode = .codingTools
+    @State private var selectedDateOffset: Int = 0
 
     private let panelWidth: CGFloat = 340
+
+    private var isViewingToday: Bool { selectedDateOffset == 0 }
+
+    private var selectedDateKey: String {
+        let calendar = Calendar.current
+        let date = calendar.date(byAdding: .day, value: selectedDateOffset, to: Date()) ?? Date()
+        return StatsStore.dateKey(for: date)
+    }
+
+    private var selectedDayStats: DailyStats {
+        store.stats(for: selectedDateKey)
+    }
+
+    private var canGoBack: Bool {
+        guard let earliest = store.sortedDateKeys.first else { return false }
+        return selectedDateKey > earliest
+    }
+
+    private var selectedClaudeDuration: TimeInterval {
+        claudeStore.duration(for: selectedDateKey)
+    }
+
+    private var selectedCursorDuration: TimeInterval {
+        cursorStore.duration(for: selectedDateKey)
+    }
+
+    private var selectedCodexDuration: TimeInterval {
+        codexStore.duration(for: selectedDateKey)
+    }
 
     private var liveTalkTime: String {
         let total = store.today.talkDurationSeconds + micMonitor.ongoingSessionSeconds
         return AppStats.formatDuration(total)
     }
 
+    private var selectedTalkTime: String {
+        if isViewingToday {
+            return liveTalkTime
+        }
+        return AppStats.formatDuration(selectedDayStats.talkDurationSeconds)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             headerBar
             todayStats
-            if claudeStore.totalDuration > 0 || cursorStore.totalDuration > 0 || codexStore.totalDuration > 0
-                || !claudeStore.activeSessions.isEmpty || !cursorStore.activeSessions.isEmpty || !codexStore.activeSessions.isEmpty {
+            if selectedClaudeDuration > 0 || selectedCursorDuration > 0 || selectedCodexDuration > 0
+                || (isViewingToday && (!claudeStore.activeSessions.isEmpty || !cursorStore.activeSessions.isEmpty || !codexStore.activeSessions.isEmpty)) {
                 Divider().padding(.horizontal, 12)
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Time AI Worked for You")
@@ -120,17 +157,37 @@ struct MenuBarView: View {
                         .padding(.horizontal, 22)
                         .padding(.bottom, 2)
 
-                    if claudeStore.totalDuration > 0 || !claudeStore.activeSessions.isEmpty {
-                        claudeSection
+                    if selectedClaudeDuration > 0 || (isViewingToday && !claudeStore.activeSessions.isEmpty) {
+                        codingToolRow(
+                            name: "Claude Code",
+                            duration: selectedClaudeDuration,
+                            tint: Self.claudeColor,
+                            assetName: "ClaudeCodeIcon",
+                            iconSize: 14
+                        )
                     }
-                    if cursorStore.totalDuration > 0 || !cursorStore.activeSessions.isEmpty {
-                        cursorSection
+                    if selectedCursorDuration > 0 || (isViewingToday && !cursorStore.activeSessions.isEmpty) {
+                        codingToolRow(
+                            name: "Cursor",
+                            duration: selectedCursorDuration,
+                            tint: Self.cursorColor,
+                            assetName: "CursorIcon",
+                            iconSize: 15
+                        )
                     }
-                    if codexStore.totalDuration > 0 || !codexStore.activeSessions.isEmpty {
-                        codexSection
+                    if selectedCodexDuration > 0 || (isViewingToday && !codexStore.activeSessions.isEmpty) {
+                        codingToolRow(
+                            name: "Codex",
+                            duration: selectedCodexDuration,
+                            tint: Self.codexColor,
+                            assetName: "CodexIcon",
+                            iconSize: 15
+                        )
                     }
 
-                    aiWeeklyComparison
+                    if isViewingToday {
+                        aiWeeklyComparison
+                    }
                 }
                 .padding(.vertical, 8)
             }
@@ -160,6 +217,7 @@ struct MenuBarView: View {
         .animation(.easeInOut(duration: 0.2), value: statsExpanded)
         .animation(.easeInOut(duration: 0.2), value: chartRange)
         .animation(.easeInOut(duration: 0.2), value: trendMode)
+        .animation(.easeInOut(duration: 0.15), value: selectedDateOffset)
     }
 
     // MARK: - Header
@@ -177,9 +235,39 @@ struct MenuBarView: View {
                 .background(.orange, in: Capsule())
             #endif
             Spacer()
-            Text(todayDateString)
-                .font(.body)
-                .foregroundStyle(.primary.opacity(0.55))
+            HStack(spacing: 4) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.15)) {
+                        selectedDateOffset -= 1
+                    }
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(.primary.opacity(canGoBack ? 0.55 : 0.2))
+                        .frame(width: 22, height: 22)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(!canGoBack)
+
+                Text(displayDateString)
+                    .font(.body)
+                    .foregroundStyle(.primary.opacity(0.55))
+
+                Button {
+                    withAnimation(.easeInOut(duration: 0.15)) {
+                        selectedDateOffset += 1
+                    }
+                } label: {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(.primary.opacity(isViewingToday ? 0.2 : 0.55))
+                        .frame(width: 22, height: 22)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(isViewingToday)
+            }
         }
         .padding(.horizontal, 16)
         .padding(.top, 14)
@@ -189,17 +277,18 @@ struct MenuBarView: View {
     // MARK: - Today Stats
 
     private var todayStats: some View {
-        VStack(spacing: 8) {
+        let day = selectedDayStats
+        return VStack(spacing: 8) {
             HStack(spacing: 10) {
-                statCell(icon: "keyboard", value: "\(store.today.keystrokes)", label: "Keystrokes")
-                statCell(icon: "cursorarrow.click.2", value: "\(store.today.pointerClicks)", label: "Clicks")
+                statCell(icon: "keyboard", value: "\(day.keystrokes)", label: "Keystrokes")
+                statCell(icon: "cursorarrow.click.2", value: "\(day.pointerClicks)", label: "Clicks")
             }
             HStack(spacing: 10) {
-                statCell(icon: "scroll", value: "\(store.today.scrollEvents)", label: "Scrolls")
-                statCell(icon: micMonitor.micInUse ? "mic.fill" : "waveform", value: liveTalkTime, label: "Talk time")
+                statCell(icon: "scroll", value: "\(day.scrollEvents)", label: "Scrolls")
+                statCell(icon: isViewingToday && micMonitor.micInUse ? "mic.fill" : "waveform", value: selectedTalkTime, label: "Talk time")
             }
 
-            if let fact = FunFact.forDay(store.today) {
+            if let fact = FunFact.forDay(day) {
                 Text(fact)
                     .font(.caption.weight(.medium))
                     .foregroundStyle(.primary.opacity(0.7))
@@ -271,7 +360,7 @@ struct MenuBarView: View {
                 .padding(.horizontal, 6)
                 .padding(.bottom, 2)
 
-            let apps = Array(store.today.topApps.prefix(5))
+            let apps = Array(selectedDayStats.topApps.prefix(5))
             if apps.isEmpty {
                 Text("No activity yet")
                     .font(.subheadline)
@@ -1052,10 +1141,18 @@ struct MenuBarView: View {
 
     // MARK: - Helpers
 
-    private var todayDateString: String {
+    private var displayDateString: String {
+        if isViewingToday {
+            return "Today"
+        }
+        if selectedDateOffset == -1 {
+            return "Yesterday"
+        }
+        let calendar = Calendar.current
+        let date = calendar.date(byAdding: .day, value: selectedDateOffset, to: Date()) ?? Date()
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM d"
-        return formatter.string(from: Date())
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: date)
     }
 
     private func shortDate(_ dateString: String) -> String {

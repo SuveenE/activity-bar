@@ -40,6 +40,14 @@ final class StatsStore: ObservableObject {
         days[currentDateKey] ?? DailyStats(date: currentDateKey)
     }
 
+    func stats(for dateKey: String) -> DailyStats {
+        days[dateKey] ?? DailyStats(date: dateKey)
+    }
+
+    var sortedDateKeys: [String] {
+        days.keys.sorted()
+    }
+
     var recentDays: [DailyStats] {
         recentDays(count: 7)
     }
