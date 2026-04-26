@@ -229,7 +229,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let sidePanel = KeyablePanel(
             contentRect: NSRect(x: 0, y: 0, width: fittingSize.width, height: fittingSize.height),
-            styleMask: [.borderless, .nonactivatingPanel],
+            styleMask: [.borderless],
             backing: .buffered,
             defer: false
         )
@@ -240,7 +240,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         sidePanel.hasShadow = false
         sidePanel.isMovable = false
         sidePanel.isReleasedWhenClosed = false
-        sidePanel.becomesKeyOnlyIfNeeded = true
 
         sidePanel.contentView = hosting
 
