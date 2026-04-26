@@ -261,8 +261,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         settingsSidePanel = sidePanel
 
-        settingsSideClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
-            self?.dismissSettingsSidePanel()
+        DispatchQueue.main.async { [weak self] in
+            self?.settingsSideClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
+                self?.dismissSettingsSidePanel()
+            }
         }
     }
 
