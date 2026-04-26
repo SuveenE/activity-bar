@@ -58,11 +58,11 @@ struct MonthlyStatsView: View {
             header
             rangePicker
             inputGrid
-            if categoryStore.hasCategories {
-                categorySection
-            }
             if hasAnyAI {
                 aiSection
+            }
+            if categoryStore.hasCategories {
+                categorySection
             }
         }
         .padding(16)
@@ -201,7 +201,7 @@ struct MonthlyStatsView: View {
             if !activeCategories.isEmpty {
                 VStack(alignment: .leading, spacing: 6) {
                     Divider().padding(.horizontal, 0)
-                    Text("Categories")
+                    Text("Screen Time by Category")
                         .font(.headline)
                         .padding(.horizontal, 6)
                         .padding(.bottom, 2)

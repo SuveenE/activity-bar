@@ -466,7 +466,7 @@ struct MenuBarView: View {
 
     private var categoryStatsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Categories")
+            Text("Screen Time by Category")
                 .font(.headline)
                 .padding(.horizontal, 6)
                 .padding(.bottom, 2)
