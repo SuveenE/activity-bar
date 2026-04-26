@@ -11,16 +11,18 @@ struct SettingsView: View {
     @State private var isAddingNew: Bool = false
 
     var body: some View {
-        VStack(spacing: 12) {
-            header
-            projectList
-            if !isAddingNew && editingProjectId == nil {
-                addButton
+        ScrollView {
+            VStack(spacing: 12) {
+                header
+                projectList
+                if !isAddingNew && editingProjectId == nil {
+                    addButton
+                }
+                Divider().padding(.horizontal, 0)
+                permissionsLink
             }
-            Divider().padding(.horizontal, 0)
-            permissionsLink
+            .padding(16)
         }
-        .padding(16)
         .frame(width: 302)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
         .overlay {
@@ -148,14 +150,11 @@ struct SettingsView: View {
                     .font(.caption.weight(.medium))
                     .foregroundStyle(.secondary)
 
-                ScrollView {
-                    VStack(spacing: 2) {
-                        ForEach(availableApps, id: \.self) { app in
-                            appToggleRow(app: app, assignedToOthers: assignedToOthers, excludingId: existingId)
-                        }
+                VStack(spacing: 2) {
+                    ForEach(availableApps, id: \.self) { app in
+                        appToggleRow(app: app, assignedToOthers: assignedToOthers, excludingId: existingId)
                     }
                 }
-                .frame(maxHeight: 160)
             }
 
             editorButtons(existingId: existingId)
