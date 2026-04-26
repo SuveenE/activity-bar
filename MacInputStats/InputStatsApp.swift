@@ -224,7 +224,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             onClose: { [weak self] in self?.dismissSettingsSidePanel() }
         )
 
-        let hosting = NSHostingView(rootView: view)
+        let hosting = FirstMouseHostingView(rootView: view)
         let fittingSize = hosting.fittingSize
 
         let sidePanel = KeyablePanel(
@@ -335,6 +335,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 private class KeyablePanel: NSPanel {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
+}
+
+private class FirstMouseHostingView<Content: View>: NSHostingView<Content> {
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
 }
 
 extension AppDelegate: NSWindowDelegate {
