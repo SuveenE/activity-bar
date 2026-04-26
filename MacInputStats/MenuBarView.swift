@@ -532,20 +532,52 @@ struct MenuBarView: View {
             .frame(height: 3)
 
             if isExpanded {
-                HStack(spacing: 16) {
-                    appDetailItem(icon: "keyboard", value: "\(stats.keystrokes)")
-                    appDetailItem(icon: "cursorarrow.click.2", value: "\(stats.pointerClicks)")
-                    appDetailItem(icon: "scroll", value: "\(stats.scrollEvents)")
-                    if stats.talkDurationSeconds > 0 {
-                        appDetailItem(icon: "waveform", value: stats.formattedTalkTime)
+                let day = selectedDayStats
+                let projectApps = project.appNames.sorted()
+                    .compactMap { name -> (name: String, stats: AppStats)? in
+                        guard let s = day.perApp[name], s.screenTimeSeconds > 0 else { return nil }
+                        return (name: name, stats: s)
                     }
+                    .sorted { $0.stats.screenTimeSeconds > $1.stats.screenTimeSeconds }
+
+                if !projectApps.isEmpty {
+                    let maxAppTime = projectApps.first?.stats.screenTimeSeconds ?? 1
+                    VStack(spacing: 4) {
+                        ForEach(projectApps, id: \.name) { app in
+                            projectAppRow(name: app.name, stats: app.stats, maxScreenTime: maxAppTime)
+                        }
+                    }
+                    .padding(.top, 4)
+                    .padding(.leading, 8)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
                 }
-                .padding(.top, 4)
-                .padding(.leading, 16)
-                .transition(.opacity.combined(with: .move(edge: .top)))
             }
         }
         .padding(.horizontal, 6)
+        .padding(.vertical, 2)
+    }
+
+    private func projectAppRow(name: String, stats: AppStats, maxScreenTime: Double) -> some View {
+        VStack(spacing: 2) {
+            HStack(spacing: 6) {
+                Text(name)
+                    .font(.caption)
+                    .lineLimit(1)
+                Spacer()
+                Text(AppStats.formatDuration(stats.screenTimeSeconds))
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.primary.opacity(0.55))
+            }
+
+            GeometryReader { geo in
+                let ratio = CGFloat(stats.screenTimeSeconds) / CGFloat(Swift.max(maxScreenTime, 1))
+                RoundedRectangle(cornerRadius: 1.5)
+                    .fill(.blue.opacity(0.2))
+                    .frame(width: geo.size.width * ratio, height: 2)
+            }
+            .frame(height: 2)
+
+        }
         .padding(.vertical, 2)
     }
 
