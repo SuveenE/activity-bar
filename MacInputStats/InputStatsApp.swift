@@ -231,7 +231,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let sidePanel = KeyablePanel(
             contentRect: NSRect(x: 0, y: 0, width: fittingSize.width, height: fittingSize.height),
-            styleMask: [.borderless],
+            styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
@@ -265,7 +265,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         hosting.postsFrameChangedNotifications = true
 
-        panel?.suppressResignDismiss = true
         sidePanel.alphaValue = 0
         sidePanel.orderFront(nil)
         NSAnimationContext.runAnimationGroup { ctx in
@@ -275,6 +274,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         settingsSidePanel = sidePanel
+        panel?.suppressResignDismiss = true
 
         DispatchQueue.main.async { [weak self] in
             self?.settingsSideClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
