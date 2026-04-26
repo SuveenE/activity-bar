@@ -10,6 +10,8 @@ struct SettingsView: View {
     @State private var draftApps: Set<String> = []
     @State private var isAddingNew: Bool = false
 
+    private var isEditing: Bool { editingCategoryId != nil || isAddingNew }
+
     @AppStorage("showInputStats") private var showInputStats = true
     @AppStorage("showAITools") private var showAITools = true
     @AppStorage("showTopApps") private var showTopApps = true
@@ -146,7 +148,7 @@ struct SettingsView: View {
                         }
                     }
                 }
-                .frame(maxHeight: 230)
+                .frame(maxHeight: isEditing ? 100 : 230)
             }
         }
     }
