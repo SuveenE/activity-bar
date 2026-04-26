@@ -125,25 +125,30 @@ struct SettingsView: View {
     // MARK: - Category List
 
     private var categoryList: some View {
-        VStack(spacing: 8) {
+        Group {
             if categoryStore.categories.isEmpty && !isAddingNew {
                 Text("Group apps into categories to see combined stats.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.vertical, 8)
-            }
+            } else {
+                ScrollView {
+                    VStack(spacing: 8) {
+                        ForEach(categoryStore.categories) { category in
+                            if editingCategoryId == category.id {
+                                categoryEditor(existingId: category.id)
+                            } else {
+                                categoryCard(category)
+                            }
+                        }
 
-            ForEach(categoryStore.categories) { category in
-                if editingCategoryId == category.id {
-                    categoryEditor(existingId: category.id)
-                } else {
-                    categoryCard(category)
+                        if isAddingNew {
+                            categoryEditor(existingId: nil)
+                        }
+                    }
                 }
-            }
-
-            if isAddingNew {
-                categoryEditor(existingId: nil)
+                .frame(maxHeight: 230)
             }
         }
     }
