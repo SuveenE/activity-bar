@@ -46,17 +46,15 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Categories")
                 .font(.headline)
-            Text("Categorize your apps by adding them to a category to see category-level stats.")
-                .font(.caption)
-                .foregroundStyle(.primary.opacity(0.55))
 
-            categoryList
-
-            if editingCategoryId != nil {
+            if isEditing {
                 categoryEditor(existingId: editingCategoryId)
-            } else if isAddingNew {
-                categoryEditor(existingId: nil)
             } else {
+                Text("Categorize your apps by adding them to a category to see category-level stats.")
+                    .font(.caption)
+                    .foregroundStyle(.primary.opacity(0.55))
+
+                categoryList
                 addButton
             }
         }
@@ -148,7 +146,7 @@ struct SettingsView: View {
                         }
                     }
                 }
-                .frame(maxHeight: isEditing ? 100 : 230)
+                .frame(maxHeight: 230)
             }
         }
     }
@@ -227,7 +225,7 @@ struct SettingsView: View {
                         }
                     }
                 }
-                .frame(maxHeight: 200)
+                .frame(maxHeight: 250)
             }
 
             Divider()
