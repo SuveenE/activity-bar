@@ -42,6 +42,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var monthlySideClickMonitor: Any?
     private var settingsSidePanel: NSPanel?
     private var settingsSideClickMonitor: Any?
+    private var settingsSizeObserver: NSObjectProtocol?
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         false
@@ -250,6 +251,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let y = mainFrame.maxY - fittingSize.height
         sidePanel.setFrame(NSRect(x: x, y: y, width: fittingSize.width, height: fittingSize.height), display: true)
 
+        settingsSizeObserver = NotificationCenter.default.addObserver(
+            forName: NSView.frameDidChangeNotification,
+            object: hosting,
+            queue: .main
+        ) { [weak self, weak sidePanel, weak mainPanel] _ in
+            guard let sidePanel, let mainPanel, let hosting = sidePanel.contentView as? NSHostingView<SettingsView> else { return }
+            let newSize = hosting.fittingSize
+            let mf = mainPanel.frame
+            let nx = mf.minX - newSize.width - gap
+            let ny = mf.maxY - newSize.height
+            sidePanel.setFrame(NSRect(x: nx, y: ny, width: newSize.width, height: newSize.height), display: true)
+        }
+        hosting.postsFrameChangedNotifications = true
+
         sidePanel.alphaValue = 0
         sidePanel.orderFront(nil)
         panel?.suppressResignDismiss = true
@@ -270,6 +285,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func dismissSettingsSidePanel() {
+        if let observer = settingsSizeObserver {
+            NotificationCenter.default.removeObserver(observer)
+            settingsSizeObserver = nil
+        }
         if let monitor = settingsSideClickMonitor {
             NSEvent.removeMonitor(monitor)
             settingsSideClickMonitor = nil
