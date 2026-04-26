@@ -61,6 +61,7 @@ struct MonthlyStatsView: View {
             if hasAnyAI {
                 aiSection
             }
+            topAppsSection
             if categoryStore.hasCategories {
                 categorySection
             }
@@ -177,6 +178,70 @@ struct MonthlyStatsView: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
         .background(.primary.opacity(0.04), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    // MARK: - Top Apps Section
+
+    private static let hiddenApps: Set<String> = ["loginwindow"]
+
+    private var aggregatedTopApps: [(name: String, screenTime: Double)] {
+        var totals: [String: Double] = [:]
+        for day in inputDays {
+            for (name, stats) in day.perApp where !Self.hiddenApps.contains(name) {
+                totals[name, default: 0] += stats.screenTimeSeconds
+            }
+        }
+        return totals
+            .map { (name: $0.key, screenTime: $0.value) }
+            .filter { $0.screenTime > 0 }
+            .sorted { $0.screenTime > $1.screenTime }
+    }
+
+    private var topAppsSection: some View {
+        let apps = Array(aggregatedTopApps.prefix(5))
+        let maxTime = apps.first?.screenTime ?? 1
+
+        return Group {
+            if !apps.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
+                    Divider().padding(.horizontal, 0)
+                    Text("Top Apps by Screen Time")
+                        .font(.headline)
+                        .padding(.horizontal, 6)
+                        .padding(.bottom, 2)
+
+                    VStack(spacing: 4) {
+                        ForEach(apps, id: \.name) { app in
+                            topAppRow(name: app.name, screenTime: app.screenTime, maxScreenTime: maxTime)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func topAppRow(name: String, screenTime: Double, maxScreenTime: Double) -> some View {
+        VStack(spacing: 3) {
+            HStack(spacing: 6) {
+                Text(name)
+                    .font(.body)
+                    .lineLimit(1)
+                Spacer()
+                Text(AppStats.formatDuration(screenTime))
+                    .font(.body.monospacedDigit())
+                    .foregroundStyle(.primary.opacity(0.55))
+            }
+
+            GeometryReader { geo in
+                let ratio = CGFloat(screenTime) / CGFloat(Swift.max(maxScreenTime, 1))
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(.blue.opacity(0.25))
+                    .frame(width: geo.size.width * ratio, height: 3)
+            }
+            .frame(height: 3)
+        }
+        .padding(.horizontal, 6)
+        .padding(.vertical, 2)
     }
 
     // MARK: - Categories Section
