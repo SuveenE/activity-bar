@@ -198,8 +198,8 @@ struct SettingsView: View {
                     .font(.caption2.weight(.medium))
                     .padding(.horizontal, 7)
                     .padding(.vertical, 3)
-                    .background(.blue.opacity(0.1), in: Capsule())
-                    .foregroundStyle(.blue)
+                    .background(.primary.opacity(0.08), in: Capsule())
+                    .foregroundStyle(.primary.opacity(0.7))
             }
         }
     }
