@@ -94,6 +94,7 @@ struct MenuBarView: View {
     var onClose: (() -> Void)?
     var onOpenSettings: (() -> Void)?
     var onOpenMonthlyStats: (() -> Void)?
+    var onReload: (() -> Void)?
     @State private var hoveredDate: String?
     @State private var hoveredTalkDate: String?
     @State private var expandedApp: String?
@@ -259,6 +260,19 @@ struct MenuBarView: View {
                 .padding(.vertical, 1)
                 .background(.orange, in: Capsule())
             #endif
+
+            Button {
+                onReload?()
+            } label: {
+                Image(systemName: "arrow.clockwise")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.primary.opacity(0.55))
+                    .frame(width: 22, height: 22)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .help("Reload stats")
+
             Spacer()
             HStack(spacing: 4) {
                 Button {

@@ -322,7 +322,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             updater: updaterController.updater,
             onClose: { [weak self] in self?.closePanel() },
             onOpenSettings: { [weak self] in self?.toggleSettings() },
-            onOpenMonthlyStats: { [weak self] in self?.toggleMonthlyStats() }
+            onOpenMonthlyStats: { [weak self] in self?.toggleMonthlyStats() },
+            onReload: { [weak self] in self?.reloadStats() }
         )
 
         if let panel {
@@ -337,6 +338,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         setIconActive(true)
         panel?.makeKey()
+    }
+
+    private func reloadStats() {
+        eventMonitors.restart()
+        store.reload()
     }
 
     private func closePanel() {
