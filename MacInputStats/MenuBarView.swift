@@ -261,18 +261,6 @@ struct MenuBarView: View {
                 .background(.orange, in: Capsule())
             #endif
 
-            Button {
-                onReload?()
-            } label: {
-                Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.primary.opacity(0.55))
-                    .frame(width: 22, height: 22)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .help("Reload stats")
-
             Spacer()
             HStack(spacing: 4) {
                 Button {
@@ -1286,6 +1274,16 @@ struct MenuBarView: View {
                     .foregroundStyle(.primary.opacity(0.55))
             }
             .buttonStyle(.plain)
+
+            Button {
+                onReload?()
+            } label: {
+                Image(systemName: "arrow.clockwise")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.primary.opacity(0.55))
+            }
+            .buttonStyle(.plain)
+            .help("Reload stats")
 
             Spacer()
 
