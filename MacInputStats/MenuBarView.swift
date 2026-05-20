@@ -1332,13 +1332,10 @@ struct MenuBarView: View {
         let parts = dateString.split(separator: "-")
         guard parts.count == 3 else { return dateString }
         let day = Int(parts[2]) ?? 0
-        let months = ["", "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
         let monthIndex = Int(parts[1]) ?? 0
-        // Show "Mon D" on 1st of month, otherwise just day number
-        if day == 1, monthIndex >= 1, monthIndex <= 12 {
-            return "\(months[monthIndex]) 1"
-        }
-        return "\(day)"
+        let months = ["", "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+        let monthStr = (monthIndex >= 1 && monthIndex <= 12) ? months[monthIndex] : ""
+        return "\(monthStr) \(day)"
     }
 
     /// Only show every Nth x-axis label to avoid crowding
