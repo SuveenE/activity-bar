@@ -823,7 +823,7 @@ struct MenuBarView: View {
                     let d = chartLabel(date)
                     let isHovered = hoveredDate == d
                     let entry = mergedByDate[date]!
-                    let maxDisplayDuration: TimeInterval = 30 * 60
+                    let maxDisplayDuration: TimeInterval = 3 * 60 * 60
                     let claudeMins = min(entry.claude?.executionDuration ?? 0, maxDisplayDuration) / 60
                     let cursorMins = min(entry.cursor?.executionDuration ?? 0, maxDisplayDuration) / 60
                     let codexMins = min(entry.codex?.executionDuration ?? 0, maxDisplayDuration) / 60
