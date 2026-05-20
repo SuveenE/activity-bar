@@ -68,6 +68,17 @@ final class StatsStore: ObservableObject {
             .map { $0 }
     }
 
+    func days(count: Int, endingDaysAgo offset: Int) -> [DailyStats] {
+        let calendar = Calendar.current
+        let endDate = calendar.date(byAdding: .day, value: -offset, to: Date()) ?? Date()
+        let startDate = calendar.date(byAdding: .day, value: -(count - 1), to: endDate) ?? endDate
+        let startKey = Self.dateKey(for: startDate)
+        let endKey = Self.dateKey(for: endDate)
+        return days.values
+            .filter { $0.date >= startKey && $0.date <= endKey }
+            .sorted { $0.date < $1.date }
+    }
+
     // MARK: - Increment Methods
 
     func incrementKeystroke(app: String) {
