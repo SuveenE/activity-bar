@@ -26,6 +26,11 @@ final class EventMonitors: ObservableObject {
         startScreenTimeTracking()
     }
 
+    func restart() {
+        stop()
+        start()
+    }
+
     func stop() {
         if let eventTap {
             CGEvent.tapEnable(tap: eventTap, enable: false)

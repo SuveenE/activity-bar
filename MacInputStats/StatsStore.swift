@@ -120,6 +120,11 @@ final class StatsStore: ObservableObject {
         days = decoded
     }
 
+    func reload() {
+        load()
+        rolloverIfNeeded()
+    }
+
     func resetToday() {
         days[currentDateKey] = DailyStats(date: currentDateKey)
         save()
