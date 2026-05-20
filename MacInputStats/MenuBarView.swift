@@ -102,6 +102,8 @@ struct MenuBarView: View {
     @AppStorage("chartRange") private var chartRange: ChartRange = .sevenDays
     @State private var trendMode: TrendMode = .input
     @State private var selectedDateOffset: Int = 0
+    @State private var chartDayOffset: Int = 0
+    @GestureState private var chartDragOffset: CGFloat = 0
     @AppStorage("showInputStats") private var showInputStats = true
     @AppStorage("showAITools") private var showAITools = true
     @AppStorage("showTopApps") private var showTopApps = true
@@ -790,9 +792,9 @@ struct MenuBarView: View {
     // MARK: - Coding Tools Chart
 
     private var codingToolsChart: some View {
-        let claudeDays = claudeStore.recentDays(count: chartRange.dayCount)
-        let cursorDays = cursorStore.recentDays(count: chartRange.dayCount)
-        let codexDays = codexStore.recentDays(count: chartRange.dayCount)
+        let claudeDays = claudeStore.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
+        let cursorDays = cursorStore.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
+        let codexDays = codexStore.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
 
         // Merge Claude + Cursor + Codex data by date
         var mergedByDate: [String: (claude: DailyClaudeStats?, cursor: DailyClaudeStats?, codex: DailyClaudeStats?)] = [:]
@@ -974,6 +976,7 @@ struct MenuBarView: View {
                 }
             }
             .frame(height: 120)
+            .gesture(chartDragGesture)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -987,6 +990,7 @@ struct MenuBarView: View {
                 Button {
                     withAnimation(.easeInOut(duration: 0.15)) {
                         chartRange = range
+                        chartDayOffset = 0
                         hoveredDate = nil
                     }
                 } label: {
@@ -1008,7 +1012,7 @@ struct MenuBarView: View {
     }
 
     private var weeklyChart: some View {
-        let days = store.recentDays(count: chartRange.dayCount)
+        let days = store.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
         let compactMode = chartRange.dayCount > 7
         let dateLabels = days.map { chartLabel($0.date) }
 
@@ -1136,6 +1140,7 @@ struct MenuBarView: View {
                 }
             }
             .frame(height: 120)
+            .gesture(chartDragGesture)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -1155,7 +1160,7 @@ struct MenuBarView: View {
     // MARK: - Talk Time
 
     private var talkTimeSection: some View {
-        let days = store.recentDays(count: chartRange.dayCount)
+        let days = store.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
         let compactMode = chartRange.dayCount > 7
         let labels = days.map { chartLabel($0.date) }
 
@@ -1238,6 +1243,7 @@ struct MenuBarView: View {
                 }
             }
             .frame(height: 60)
+            .gesture(chartDragGesture)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -1343,6 +1349,22 @@ struct MenuBarView: View {
         guard let idx = allLabels.firstIndex(of: label) else { return false }
         let step = chartRange.dayCount <= 14 ? 2 : 5
         return idx % step == 0 || idx == allLabels.count - 1
+    }
+
+    private var chartDragGesture: some Gesture {
+        DragGesture(minimumDistance: 20)
+            .onEnded { value in
+                let threshold: CGFloat = 50
+                if value.translation.width > threshold {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        chartDayOffset += chartRange.dayCount
+                    }
+                } else if value.translation.width < -threshold {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        chartDayOffset = max(0, chartDayOffset - chartRange.dayCount)
+                    }
+                }
+            }
     }
 
     private func talkAxisLabel(_ minutes: Double) -> String {

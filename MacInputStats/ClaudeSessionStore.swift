@@ -83,6 +83,17 @@ final class ClaudeSessionStore: ObservableObject {
             .map { $0 }
     }
 
+    func days(count: Int, endingDaysAgo offset: Int) -> [DailyClaudeStats] {
+        let calendar = Calendar.current
+        let endDate = calendar.date(byAdding: .day, value: -offset, to: Date()) ?? Date()
+        let startDate = calendar.date(byAdding: .day, value: -(count - 1), to: endDate) ?? endDate
+        let startKey = StatsStore.dateKey(for: startDate)
+        let endKey = StatsStore.dateKey(for: endDate)
+        return days.values
+            .filter { $0.date >= startKey && $0.date <= endKey }
+            .sorted { $0.date < $1.date }
+    }
+
     /// Merged recent events across all sessions, sorted newest first.
     var recentActivity: [ActivityItem] {
         sessions.values
