@@ -15,6 +15,10 @@ final class ClaudeSessionStore: ObservableObject {
         UserDefaults(suiteName: "com.suveene.MacInputStats") ?? .standard
     }
 
+    // Cap a single active chunk to 30 minutes to discard stale durations
+    // from missed events (e.g. machine sleep, dropped connections)
+    private static let maxChunkDuration: TimeInterval = 30 * 60
+
     private var currentDateKey: String = StatsStore.dateKey(for: Date())
 
     init() {
@@ -65,7 +69,7 @@ final class ClaudeSessionStore: ObservableObject {
         let now = Date()
         let inProgress = sessions.values.reduce(0.0) { total, session in
             guard let activeStart = session.activeStartedAt else { return total }
-            return total + now.timeIntervalSince(activeStart)
+            return total + min(now.timeIntervalSince(activeStart), Self.maxChunkDuration)
         }
         return persisted + inProgress
     }
@@ -120,7 +124,8 @@ final class ClaudeSessionStore: ObservableObject {
             let wasActive = session.spriteState == .working || session.spriteState == .compacting
             let isActive = newState == .working || newState == .compacting
             if wasActive && !isActive, let start = session.activeStartedAt {
-                let chunk = Date().timeIntervalSince(start)
+                let raw = Date().timeIntervalSince(start)
+                let chunk = min(raw, Self.maxChunkDuration)
                 session.activeDuration += chunk
                 session.activeStartedAt = nil
                 days[currentDateKey, default: DailyClaudeStats(date: currentDateKey)].executionDuration += chunk
@@ -187,7 +192,8 @@ final class ClaudeSessionStore: ObservableObject {
         if event.event == .sessionEnd {
             // Flush any remaining active duration before cleanup
             if var session = sessions[id], let start = session.activeStartedAt {
-                let chunk = Date().timeIntervalSince(start)
+                let raw = Date().timeIntervalSince(start)
+                let chunk = min(raw, Self.maxChunkDuration)
                 session.activeDuration += chunk
                 session.activeStartedAt = nil
                 days[currentDateKey, default: DailyClaudeStats(date: currentDateKey)].executionDuration += chunk
