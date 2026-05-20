@@ -3,16 +3,16 @@
   <channel>
     <title>Activity Bar</title>
     <item>
-      <title>Version 1.3.5</title>
-      <sparkle:version>32</sparkle:version>
-      <sparkle:shortVersionString>1.3.5</sparkle:shortVersionString>
-      <pubDate>Wed, 20 May 2026 14:45:27 +0000</pubDate>
+      <title>Version 1.3.6</title>
+      <sparkle:version>33</sparkle:version>
+      <sparkle:shortVersionString>1.3.6</sparkle:shortVersionString>
+      <pubDate>Wed, 20 May 2026 16:22:03 +0000</pubDate>
       <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
       <enclosure
-        url="https://github.com/SuveenE/activity-bar/releases/download/v1.3.5/ActivityBar.dmg"
-        length="3930974"
+        url="https://github.com/SuveenE/activity-bar/releases/download/v1.3.6/ActivityBar.dmg"
+        length="3971533"
         type="application/octet-stream"
-        sparkle:edSignature="lQ1v23wbz2o2jDo29a/sGOCau9cM32Wjfe+jCHIaKKBy+ndjIedzuzM2GCorRlfbHV1h7grC9hiiVDqDe0E/Cg=="
+        sparkle:edSignature="w+TnEpGprFxnW8MX99NBVe1/ZcElw6bjbucXRL8jxi6zeJAqmPoF9zMsyAjpepbGnipxHvR4H66xhNKc8vZyCw=="
       />
     </item>
   </channel>
