@@ -823,9 +823,10 @@ struct MenuBarView: View {
                     let d = chartLabel(date)
                     let isHovered = hoveredDate == d
                     let entry = mergedByDate[date]!
-                    let claudeMins = (entry.claude?.executionDuration ?? 0) / 60
-                    let cursorMins = (entry.cursor?.executionDuration ?? 0) / 60
-                    let codexMins = (entry.codex?.executionDuration ?? 0) / 60
+                    let maxDisplayDuration: TimeInterval = 30 * 60
+                    let claudeMins = min(entry.claude?.executionDuration ?? 0, maxDisplayDuration) / 60
+                    let cursorMins = min(entry.cursor?.executionDuration ?? 0, maxDisplayDuration) / 60
+                    let codexMins = min(entry.codex?.executionDuration ?? 0, maxDisplayDuration) / 60
 
                     if hasClaude {
                         LineMark(x: .value("Date", d), y: .value("Minutes", claudeMins), series: .value("Tool", "Claude"))
@@ -856,15 +857,15 @@ struct MenuBarView: View {
                                         .foregroundStyle(.primary.opacity(0.55))
                                     HStack(spacing: 6) {
                                         if hasClaude {
-                                            Text(shortDuration(entry.claude?.executionDuration ?? 0))
+                                            Text(shortDuration(min(entry.claude?.executionDuration ?? 0, maxDisplayDuration)))
                                                 .foregroundStyle(Self.claudeColor)
                                         }
                                         if hasCursor {
-                                            Text(shortDuration(entry.cursor?.executionDuration ?? 0))
+                                            Text(shortDuration(min(entry.cursor?.executionDuration ?? 0, maxDisplayDuration)))
                                                 .foregroundStyle(.purple)
                                         }
                                         if hasCodex {
-                                            Text(shortDuration(entry.codex?.executionDuration ?? 0))
+                                            Text(shortDuration(min(entry.codex?.executionDuration ?? 0, maxDisplayDuration)))
                                                 .foregroundStyle(Self.codexColor)
                                         }
                                     }
