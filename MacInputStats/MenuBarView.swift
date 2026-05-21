@@ -1351,13 +1351,30 @@ struct MenuBarView: View {
         return idx % step == 0 || idx == allLabels.count - 1
     }
 
+    private var maxChartDayOffset: Int {
+        let allEarliestKeys = [
+            store.sortedDateKeys.first,
+            claudeStore.recentDays(count: .max).first?.date,
+            cursorStore.recentDays(count: .max).first?.date,
+            codexStore.recentDays(count: .max).first?.date,
+        ]
+        guard let earliest = allEarliestKeys.compactMap({ $0 }).min() else { return 0 }
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        guard let earliestDate = formatter.date(from: earliest) else { return 0 }
+        let daysAvailable = Calendar.current.dateComponents([.day], from: earliestDate, to: Date()).day ?? 0
+        return max(0, daysAvailable - chartRange.dayCount)
+    }
+
     private var chartDragGesture: some Gesture {
         DragGesture(minimumDistance: 20)
             .onEnded { value in
                 let threshold: CGFloat = 50
                 if value.translation.width > threshold {
                     withAnimation(.easeInOut(duration: 0.2)) {
-                        chartDayOffset += chartRange.dayCount
+                        chartDayOffset = min(chartDayOffset + chartRange.dayCount, maxChartDayOffset)
                     }
                 } else if value.translation.width < -threshold {
                     withAnimation(.easeInOut(duration: 0.2)) {
