@@ -56,6 +56,21 @@ struct DailyStats: Codable, Identifiable, Equatable {
 
     var id: String { date }
 
+    init(date: String) {
+        self.date = date
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        date = try container.decode(String.self, forKey: .date)
+        keystrokes = try container.decodeIfPresent(Int.self, forKey: .keystrokes) ?? 0
+        pointerClicks = try container.decodeIfPresent(Int.self, forKey: .pointerClicks) ?? 0
+        scrollEvents = try container.decodeIfPresent(Int.self, forKey: .scrollEvents) ?? 0
+        talkDurationSeconds = try container.decodeIfPresent(Double.self, forKey: .talkDurationSeconds) ?? 0
+        perApp = try container.decodeIfPresent([String: AppStats].self, forKey: .perApp) ?? [:]
+        perHour = try container.decodeIfPresent([String: HourlyStats].self, forKey: .perHour) ?? [:]
+    }
+
     var formattedTalkTime: String {
         AppStats.formatDuration(talkDurationSeconds)
     }
