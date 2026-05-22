@@ -76,12 +76,11 @@ final class StatsStore: ObservableObject {
     func days(count: Int, endingDaysAgo offset: Int) -> [DailyStats] {
         let calendar = Calendar.current
         let endDate = calendar.date(byAdding: .day, value: -offset, to: Date()) ?? Date()
-        let startDate = calendar.date(byAdding: .day, value: -(count - 1), to: endDate) ?? endDate
-        let startKey = Self.dateKey(for: startDate)
-        let endKey = Self.dateKey(for: endDate)
-        return days.values
-            .filter { $0.date >= startKey && $0.date <= endKey }
-            .sorted { $0.date < $1.date }
+        return (0..<count).reversed().map { i in
+            let date = calendar.date(byAdding: .day, value: -i, to: endDate) ?? endDate
+            let key = Self.dateKey(for: date)
+            return days[key] ?? DailyStats(date: key)
+        }
     }
 
     // MARK: - Increment Methods
