@@ -1412,6 +1412,17 @@ struct MenuBarView: View {
 
             Spacer()
 
+            Button {
+                NSWorkspace.shared.open(URL(string: "https://github.com/SuveenE/activity-bar")!)
+            } label: {
+                Image("github")
+                    .resizable()
+                    .frame(width: 14, height: 14)
+                    .foregroundStyle(.primary.opacity(0.55))
+            }
+            .buttonStyle(.plain)
+            .help("View on GitHub")
+
             Button(action: showQuitAlert) {
                 Text("Quit")
                     .font(.subheadline)
