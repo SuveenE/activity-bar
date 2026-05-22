@@ -38,6 +38,13 @@ struct AppStats: Codable, Equatable {
     }
 }
 
+struct HourlyStats: Codable, Equatable {
+    var keystrokes: Int = 0
+    var pointerClicks: Int = 0
+    var scrollEvents: Int = 0
+    var talkDurationSeconds: Double = 0
+}
+
 struct DailyStats: Codable, Identifiable, Equatable {
     let date: String
     var keystrokes: Int = 0
@@ -45,6 +52,7 @@ struct DailyStats: Codable, Identifiable, Equatable {
     var scrollEvents: Int = 0
     var talkDurationSeconds: Double = 0
     var perApp: [String: AppStats] = [:]
+    var perHour: [String: HourlyStats] = [:]
 
     var id: String { date }
 

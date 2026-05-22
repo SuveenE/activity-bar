@@ -132,9 +132,11 @@ final class ClaudeSessionStore: ObservableObject {
             let isActive = newState == .working || newState == .compacting
             if wasActive && !isActive, let start = session.activeStartedAt {
                 let chunk = Date().timeIntervalSince(start)
+                let hour = StatsStore.hourKey(for: Date())
                 session.activeDuration += chunk
                 session.activeStartedAt = nil
                 days[currentDateKey, default: DailyClaudeStats(date: currentDateKey)].executionDuration += chunk
+                days[currentDateKey]?.perHour[hour, default: 0] += chunk
                 if let project = Self.projectName(for: session.cwd) {
                     days[currentDateKey]?.perProject[project, default: ClaudeProjectStats()].executionDuration += chunk
                 }
@@ -199,9 +201,11 @@ final class ClaudeSessionStore: ObservableObject {
             // Flush any remaining active duration before cleanup
             if var session = sessions[id], let start = session.activeStartedAt {
                 let chunk = Date().timeIntervalSince(start)
+                let hour = StatsStore.hourKey(for: Date())
                 session.activeDuration += chunk
                 session.activeStartedAt = nil
                 days[currentDateKey, default: DailyClaudeStats(date: currentDateKey)].executionDuration += chunk
+                days[currentDateKey]?.perHour[hour, default: 0] += chunk
                 if let project = Self.projectName(for: session.cwd) {
                     days[currentDateKey]?.perProject[project, default: ClaudeProjectStats()].executionDuration += chunk
                 }

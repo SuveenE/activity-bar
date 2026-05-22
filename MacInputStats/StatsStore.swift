@@ -25,6 +25,11 @@ final class StatsStore: ObservableObject {
         return formatter.string(from: date)
     }
 
+    static func hourKey(for date: Date) -> String {
+        let hour = Calendar.current.component(.hour, from: date)
+        return String(format: "%02d", hour)
+    }
+
     func rolloverIfNeeded(now: Date = Date()) {
         let today = Self.dateKey(for: now)
         if currentDateKey != today {
@@ -83,29 +88,37 @@ final class StatsStore: ObservableObject {
 
     func incrementKeystroke(app: String) {
         rolloverIfNeeded()
+        let hour = Self.hourKey(for: Date())
         days[currentDateKey, default: DailyStats(date: currentDateKey)].keystrokes += 1
         days[currentDateKey]?.perApp[app, default: AppStats()].keystrokes += 1
+        days[currentDateKey]?.perHour[hour, default: HourlyStats()].keystrokes += 1
         save()
     }
 
     func incrementPointerClick(app: String) {
         rolloverIfNeeded()
+        let hour = Self.hourKey(for: Date())
         days[currentDateKey, default: DailyStats(date: currentDateKey)].pointerClicks += 1
         days[currentDateKey]?.perApp[app, default: AppStats()].pointerClicks += 1
+        days[currentDateKey]?.perHour[hour, default: HourlyStats()].pointerClicks += 1
         save()
     }
 
     func incrementScroll(app: String) {
         rolloverIfNeeded()
+        let hour = Self.hourKey(for: Date())
         days[currentDateKey, default: DailyStats(date: currentDateKey)].scrollEvents += 1
         days[currentDateKey]?.perApp[app, default: AppStats()].scrollEvents += 1
+        days[currentDateKey]?.perHour[hour, default: HourlyStats()].scrollEvents += 1
         save()
     }
 
     func addTalkDuration(_ seconds: Double, app: String) {
         rolloverIfNeeded()
+        let hour = Self.hourKey(for: Date())
         days[currentDateKey, default: DailyStats(date: currentDateKey)].talkDurationSeconds += seconds
         days[currentDateKey]?.perApp[app, default: AppStats()].talkDurationSeconds += seconds
+        days[currentDateKey]?.perHour[hour, default: HourlyStats()].talkDurationSeconds += seconds
         save()
     }
 

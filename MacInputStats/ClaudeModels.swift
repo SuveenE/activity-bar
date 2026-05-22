@@ -104,6 +104,7 @@ struct DailyClaudeStats: Codable, Identifiable {
     var executionDuration: TimeInterval = 0
     var wordCount: Int = 0
     var perProject: [String: ClaudeProjectStats] = [:]
+    var perHour: [String: TimeInterval] = [:]
 
     init(date: String) {
         self.date = date

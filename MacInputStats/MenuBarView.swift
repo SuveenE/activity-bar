@@ -792,9 +792,11 @@ struct MenuBarView: View {
     // MARK: - Coding Tools Chart
 
     private var codingToolsChart: some View {
+        let isHourly = chartRange == .oneDay
         let claudeDays = claudeStore.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
         let cursorDays = cursorStore.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
         let codexDays = codexStore.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
+        let hourlyLabels = (0..<24).map { String(format: "%02d", $0) }
 
         // Merge Claude + Cursor + Codex data by date
         var mergedByDate: [String: (claude: DailyClaudeStats?, cursor: DailyClaudeStats?, codex: DailyClaudeStats?)] = [:]
@@ -804,11 +806,25 @@ struct MenuBarView: View {
 
         let allDates = mergedByDate.keys.sorted()
         let compactMode = chartRange.dayCount > 7
-        let dateLabels = allDates.map { chartLabel($0) }
+        let dateLabels = isHourly ? hourlyLabels.map { hourChartLabel($0) } : allDates.map { chartLabel($0) }
 
-        let hasClaude = mergedByDate.values.contains { ($0.claude?.executionDuration ?? 0) > 0 }
-        let hasCursor = mergedByDate.values.contains { ($0.cursor?.executionDuration ?? 0) > 0 }
-        let hasCodex = mergedByDate.values.contains { ($0.codex?.executionDuration ?? 0) > 0 }
+        // For hourly mode, merge per-hour data from the single day
+        let claudeHourly = claudeDays.first?.perHour ?? [:]
+        let cursorHourly = cursorDays.first?.perHour ?? [:]
+        let codexHourly = codexDays.first?.perHour ?? [:]
+
+        let hasClaude: Bool
+        let hasCursor: Bool
+        let hasCodex: Bool
+        if isHourly {
+            hasClaude = claudeHourly.values.contains { $0 > 0 }
+            hasCursor = cursorHourly.values.contains { $0 > 0 }
+            hasCodex = codexHourly.values.contains { $0 > 0 }
+        } else {
+            hasClaude = mergedByDate.values.contains { ($0.claude?.executionDuration ?? 0) > 0 }
+            hasCursor = mergedByDate.values.contains { ($0.cursor?.executionDuration ?? 0) > 0 }
+            hasCodex = mergedByDate.values.contains { ($0.codex?.executionDuration ?? 0) > 0 }
+        }
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -821,93 +837,111 @@ struct MenuBarView: View {
             .padding(.horizontal, 6)
 
             Chart {
-                ForEach(allDates, id: \.self) { date in
-                    let d = chartLabel(date)
-                    let isHovered = hoveredDate == d
-                    let entry = mergedByDate[date]!
-                    let claudeMins = (entry.claude?.executionDuration ?? 0) / 60
-                    let cursorMins = (entry.cursor?.executionDuration ?? 0) / 60
-                    let codexMins = (entry.codex?.executionDuration ?? 0) / 60
+                if isHourly {
+                    ForEach(hourlyLabels, id: \.self) { hour in
+                        let label = hourChartLabel(hour)
+                        let isHoveredHour = hoveredDate == label
+                        let claudeMins = (claudeHourly[hour] ?? 0) / 60
+                        let cursorMins = (cursorHourly[hour] ?? 0) / 60
+                        let codexMins = (codexHourly[hour] ?? 0) / 60
 
-                    if hasClaude {
-                        LineMark(x: .value("Date", d), y: .value("Minutes", claudeMins), series: .value("Tool", "Claude"))
-                            .foregroundStyle(by: .value("Tool", "Claude"))
-                            .interpolationMethod(.catmullRom)
-                    }
+                        if hasClaude {
+                            LineMark(x: .value("Hour", label), y: .value("Minutes", claudeMins), series: .value("Tool", "Claude"))
+                                .foregroundStyle(by: .value("Tool", "Claude"))
+                                .interpolationMethod(.catmullRom)
+                        }
+                        if hasCursor {
+                            LineMark(x: .value("Hour", label), y: .value("Minutes", cursorMins), series: .value("Tool", "Cursor"))
+                                .foregroundStyle(by: .value("Tool", "Cursor"))
+                                .interpolationMethod(.catmullRom)
+                        }
+                        if hasCodex {
+                            LineMark(x: .value("Hour", label), y: .value("Minutes", codexMins), series: .value("Tool", "Codex"))
+                                .foregroundStyle(by: .value("Tool", "Codex"))
+                                .interpolationMethod(.catmullRom)
+                        }
 
-                    if hasCursor {
-                        LineMark(x: .value("Date", d), y: .value("Minutes", cursorMins), series: .value("Tool", "Cursor"))
-                            .foregroundStyle(by: .value("Tool", "Cursor"))
-                            .interpolationMethod(.catmullRom)
-                    }
-
-                    if hasCodex {
-                        LineMark(x: .value("Date", d), y: .value("Minutes", codexMins), series: .value("Tool", "Codex"))
-                            .foregroundStyle(by: .value("Tool", "Codex"))
-                            .interpolationMethod(.catmullRom)
-                    }
-
-                    if isHovered {
-                        RuleMark(x: .value("Date", d))
-                            .foregroundStyle(.gray.opacity(0.3))
-                            .lineStyle(StrokeStyle(dash: [4, 4]))
-                            .annotation(position: .top, spacing: 0, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
-                                VStack(spacing: 2) {
-                                    Text(shortDate(date))
-                                        .font(.system(size: 9))
-                                        .foregroundStyle(.primary.opacity(0.55))
-                                    HStack(spacing: 6) {
-                                        if hasClaude {
-                                            Text(shortDuration(entry.claude?.executionDuration ?? 0))
-                                                .foregroundStyle(Self.claudeColor)
+                        if isHoveredHour {
+                            RuleMark(x: .value("Hour", label))
+                                .foregroundStyle(.gray.opacity(0.3))
+                                .lineStyle(StrokeStyle(dash: [4, 4]))
+                                .annotation(position: .top, spacing: 0, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
+                                    VStack(spacing: 2) {
+                                        Text(label)
+                                            .font(.system(size: 9))
+                                            .foregroundStyle(.primary.opacity(0.55))
+                                        HStack(spacing: 6) {
+                                            if hasClaude { Text(shortDuration(claudeHourly[hour] ?? 0)).foregroundStyle(Self.claudeColor) }
+                                            if hasCursor { Text(shortDuration(cursorHourly[hour] ?? 0)).foregroundStyle(.purple) }
+                                            if hasCodex { Text(shortDuration(codexHourly[hour] ?? 0)).foregroundStyle(Self.codexColor) }
                                         }
-                                        if hasCursor {
-                                            Text(shortDuration(entry.cursor?.executionDuration ?? 0))
-                                                .foregroundStyle(.purple)
-                                        }
-                                        if hasCodex {
-                                            Text(shortDuration(entry.codex?.executionDuration ?? 0))
-                                                .foregroundStyle(Self.codexColor)
-                                        }
+                                        .font(.system(size: 10).bold().monospacedDigit())
                                     }
-                                    .font(.system(size: 10).bold().monospacedDigit())
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 3)
+                                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 4))
+                                    .offset(y: 30)
                                 }
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 3)
-                                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 4))
-                                .offset(y: 30)
-                            }
+
+                            if hasClaude { PointMark(x: .value("Hour", label), y: .value("Minutes", claudeMins)).foregroundStyle(Self.claudeColor).symbolSize(30) }
+                            if hasCursor { PointMark(x: .value("Hour", label), y: .value("Minutes", cursorMins)).foregroundStyle(.purple).symbolSize(30) }
+                            if hasCodex { PointMark(x: .value("Hour", label), y: .value("Minutes", codexMins)).foregroundStyle(Self.codexColor).symbolSize(30) }
+                        }
+                    }
+                } else {
+                    ForEach(allDates, id: \.self) { date in
+                        let d = chartLabel(date)
+                        let isHovered = hoveredDate == d
+                        let entry = mergedByDate[date]!
+                        let claudeMins = (entry.claude?.executionDuration ?? 0) / 60
+                        let cursorMins = (entry.cursor?.executionDuration ?? 0) / 60
+                        let codexMins = (entry.codex?.executionDuration ?? 0) / 60
 
                         if hasClaude {
-                            PointMark(x: .value("Date", d), y: .value("Minutes", claudeMins))
-                                .foregroundStyle(Self.claudeColor)
-                                .symbolSize(30)
+                            LineMark(x: .value("Date", d), y: .value("Minutes", claudeMins), series: .value("Tool", "Claude"))
+                                .foregroundStyle(by: .value("Tool", "Claude"))
+                                .interpolationMethod(.catmullRom)
                         }
                         if hasCursor {
-                            PointMark(x: .value("Date", d), y: .value("Minutes", cursorMins))
-                                .foregroundStyle(.purple)
-                                .symbolSize(30)
+                            LineMark(x: .value("Date", d), y: .value("Minutes", cursorMins), series: .value("Tool", "Cursor"))
+                                .foregroundStyle(by: .value("Tool", "Cursor"))
+                                .interpolationMethod(.catmullRom)
                         }
                         if hasCodex {
-                            PointMark(x: .value("Date", d), y: .value("Minutes", codexMins))
-                                .foregroundStyle(Self.codexColor)
-                                .symbolSize(30)
+                            LineMark(x: .value("Date", d), y: .value("Minutes", codexMins), series: .value("Tool", "Codex"))
+                                .foregroundStyle(by: .value("Tool", "Codex"))
+                                .interpolationMethod(.catmullRom)
                         }
-                    } else if !compactMode {
-                        if hasClaude {
-                            PointMark(x: .value("Date", d), y: .value("Minutes", claudeMins))
-                                .foregroundStyle(Self.claudeColor)
-                                .symbolSize(12)
-                        }
-                        if hasCursor {
-                            PointMark(x: .value("Date", d), y: .value("Minutes", cursorMins))
-                                .foregroundStyle(.purple)
-                                .symbolSize(12)
-                        }
-                        if hasCodex {
-                            PointMark(x: .value("Date", d), y: .value("Minutes", codexMins))
-                                .foregroundStyle(Self.codexColor)
-                                .symbolSize(12)
+
+                        if isHovered {
+                            RuleMark(x: .value("Date", d))
+                                .foregroundStyle(.gray.opacity(0.3))
+                                .lineStyle(StrokeStyle(dash: [4, 4]))
+                                .annotation(position: .top, spacing: 0, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
+                                    VStack(spacing: 2) {
+                                        Text(shortDate(date))
+                                            .font(.system(size: 9))
+                                            .foregroundStyle(.primary.opacity(0.55))
+                                        HStack(spacing: 6) {
+                                            if hasClaude { Text(shortDuration(entry.claude?.executionDuration ?? 0)).foregroundStyle(Self.claudeColor) }
+                                            if hasCursor { Text(shortDuration(entry.cursor?.executionDuration ?? 0)).foregroundStyle(.purple) }
+                                            if hasCodex { Text(shortDuration(entry.codex?.executionDuration ?? 0)).foregroundStyle(Self.codexColor) }
+                                        }
+                                        .font(.system(size: 10).bold().monospacedDigit())
+                                    }
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 3)
+                                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 4))
+                                    .offset(y: 30)
+                                }
+
+                            if hasClaude { PointMark(x: .value("Date", d), y: .value("Minutes", claudeMins)).foregroundStyle(Self.claudeColor).symbolSize(30) }
+                            if hasCursor { PointMark(x: .value("Date", d), y: .value("Minutes", cursorMins)).foregroundStyle(.purple).symbolSize(30) }
+                            if hasCodex { PointMark(x: .value("Date", d), y: .value("Minutes", codexMins)).foregroundStyle(Self.codexColor).symbolSize(30) }
+                        } else if !compactMode {
+                            if hasClaude { PointMark(x: .value("Date", d), y: .value("Minutes", claudeMins)).foregroundStyle(Self.claudeColor).symbolSize(12) }
+                            if hasCursor { PointMark(x: .value("Date", d), y: .value("Minutes", cursorMins)).foregroundStyle(.purple).symbolSize(12) }
+                            if hasCodex { PointMark(x: .value("Date", d), y: .value("Minutes", codexMins)).foregroundStyle(Self.codexColor).symbolSize(12) }
                         }
                     }
                 }
@@ -932,7 +966,7 @@ struct MenuBarView: View {
             .chartXAxis {
                 AxisMarks(values: .automatic) { value in
                     AxisGridLine()
-                    if compactMode {
+                    if isHourly || compactMode {
                         AxisValueLabel() {
                             if let label = value.as(String.self) {
                                 if shouldShowXLabel(label, in: dateLabels) {
@@ -1012,9 +1046,12 @@ struct MenuBarView: View {
     }
 
     private var weeklyChart: some View {
+        let isHourly = chartRange == .oneDay
         let days = store.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
+        let dayStats = days.first
+        let hourlyLabels = (0..<24).map { String(format: "%02d", $0) }
         let compactMode = chartRange.dayCount > 7
-        let dateLabels = days.map { chartLabel($0.date) }
+        let dateLabels = isHourly ? hourlyLabels : days.map { chartLabel($0.date) }
 
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -1027,63 +1064,116 @@ struct MenuBarView: View {
             .padding(.horizontal, 6)
 
             Chart {
-                ForEach(days) { day in
-                    let d = chartLabel(day.date)
-                    let isHovered = hoveredDate == d
+                if isHourly, let stats = dayStats {
+                    ForEach(hourlyLabels, id: \.self) { hour in
+                        let hourData = stats.perHour[hour] ?? HourlyStats()
+                        let label = hourChartLabel(hour)
+                        let isHoveredHour = hoveredDate == label
 
-                    LineMark(x: .value("Date", d), y: .value("Count", day.keystrokes), series: .value("Metric", "Keystrokes"))
-                        .foregroundStyle(by: .value("Metric", "Keystrokes"))
-                        .interpolationMethod(.catmullRom)
+                        LineMark(x: .value("Hour", label), y: .value("Count", hourData.keystrokes), series: .value("Metric", "Keystrokes"))
+                            .foregroundStyle(by: .value("Metric", "Keystrokes"))
+                            .interpolationMethod(.catmullRom)
 
-                    LineMark(x: .value("Date", d), y: .value("Count", day.pointerClicks), series: .value("Metric", "Clicks"))
-                        .foregroundStyle(by: .value("Metric", "Clicks"))
-                        .interpolationMethod(.catmullRom)
+                        LineMark(x: .value("Hour", label), y: .value("Count", hourData.pointerClicks), series: .value("Metric", "Clicks"))
+                            .foregroundStyle(by: .value("Metric", "Clicks"))
+                            .interpolationMethod(.catmullRom)
 
-                    LineMark(x: .value("Date", d), y: .value("Count", day.scrollEvents), series: .value("Metric", "Scrolls"))
-                        .foregroundStyle(by: .value("Metric", "Scrolls"))
-                        .interpolationMethod(.catmullRom)
+                        LineMark(x: .value("Hour", label), y: .value("Count", hourData.scrollEvents), series: .value("Metric", "Scrolls"))
+                            .foregroundStyle(by: .value("Metric", "Scrolls"))
+                            .interpolationMethod(.catmullRom)
 
-                    if isHovered {
-                        RuleMark(x: .value("Date", d))
-                            .foregroundStyle(.gray.opacity(0.3))
-                            .lineStyle(StrokeStyle(dash: [4, 4]))
-                            .annotation(position: .top, spacing: 0, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
-                                VStack(spacing: 2) {
-                                    Text(shortDate(day.date))
-                                        .font(.system(size: 9))
-                                        .foregroundStyle(.primary.opacity(0.55))
-                                    HStack(spacing: 6) {
-                                        Text("\(day.keystrokes)").foregroundStyle(.blue)
-                                        Text("\(day.pointerClicks)").foregroundStyle(.orange)
-                                        Text("\(day.scrollEvents)").foregroundStyle(.green)
+                        if isHoveredHour {
+                            RuleMark(x: .value("Hour", label))
+                                .foregroundStyle(.gray.opacity(0.3))
+                                .lineStyle(StrokeStyle(dash: [4, 4]))
+                                .annotation(position: .top, spacing: 0, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
+                                    VStack(spacing: 2) {
+                                        Text(label)
+                                            .font(.system(size: 9))
+                                            .foregroundStyle(.primary.opacity(0.55))
+                                        HStack(spacing: 6) {
+                                            Text("\(hourData.keystrokes)").foregroundStyle(.blue)
+                                            Text("\(hourData.pointerClicks)").foregroundStyle(.orange)
+                                            Text("\(hourData.scrollEvents)").foregroundStyle(.green)
+                                        }
+                                        .font(.system(size: 10).bold().monospacedDigit())
                                     }
-                                    .font(.system(size: 10).bold().monospacedDigit())
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 3)
+                                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 4))
+                                    .offset(y: 30)
                                 }
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 3)
-                                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 4))
-                                .offset(y: 30)
-                            }
 
-                        PointMark(x: .value("Date", d), y: .value("Count", day.keystrokes))
-                            .foregroundStyle(.blue)
-                            .symbolSize(30)
-                        PointMark(x: .value("Date", d), y: .value("Count", day.pointerClicks))
-                            .foregroundStyle(.orange)
-                            .symbolSize(30)
-                        PointMark(x: .value("Date", d), y: .value("Count", day.scrollEvents))
-                            .foregroundStyle(.green)
-                            .symbolSize(30)
-                    } else if !compactMode {
-                        PointMark(x: .value("Date", d), y: .value("Count", day.keystrokes))
-                            .foregroundStyle(.blue)
-                            .symbolSize(12)
-                        PointMark(x: .value("Date", d), y: .value("Count", day.pointerClicks))
-                            .foregroundStyle(.orange)
-                            .symbolSize(12)
-                        PointMark(x: .value("Date", d), y: .value("Count", day.scrollEvents))
-                            .foregroundStyle(.green)
-                            .symbolSize(12)
+                            PointMark(x: .value("Hour", label), y: .value("Count", hourData.keystrokes))
+                                .foregroundStyle(.blue)
+                                .symbolSize(30)
+                            PointMark(x: .value("Hour", label), y: .value("Count", hourData.pointerClicks))
+                                .foregroundStyle(.orange)
+                                .symbolSize(30)
+                            PointMark(x: .value("Hour", label), y: .value("Count", hourData.scrollEvents))
+                                .foregroundStyle(.green)
+                                .symbolSize(30)
+                        }
+                    }
+                } else {
+                    ForEach(days) { day in
+                        let d = chartLabel(day.date)
+                        let isHovered = hoveredDate == d
+
+                        LineMark(x: .value("Date", d), y: .value("Count", day.keystrokes), series: .value("Metric", "Keystrokes"))
+                            .foregroundStyle(by: .value("Metric", "Keystrokes"))
+                            .interpolationMethod(.catmullRom)
+
+                        LineMark(x: .value("Date", d), y: .value("Count", day.pointerClicks), series: .value("Metric", "Clicks"))
+                            .foregroundStyle(by: .value("Metric", "Clicks"))
+                            .interpolationMethod(.catmullRom)
+
+                        LineMark(x: .value("Date", d), y: .value("Count", day.scrollEvents), series: .value("Metric", "Scrolls"))
+                            .foregroundStyle(by: .value("Metric", "Scrolls"))
+                            .interpolationMethod(.catmullRom)
+
+                        if isHovered {
+                            RuleMark(x: .value("Date", d))
+                                .foregroundStyle(.gray.opacity(0.3))
+                                .lineStyle(StrokeStyle(dash: [4, 4]))
+                                .annotation(position: .top, spacing: 0, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
+                                    VStack(spacing: 2) {
+                                        Text(shortDate(day.date))
+                                            .font(.system(size: 9))
+                                            .foregroundStyle(.primary.opacity(0.55))
+                                        HStack(spacing: 6) {
+                                            Text("\(day.keystrokes)").foregroundStyle(.blue)
+                                            Text("\(day.pointerClicks)").foregroundStyle(.orange)
+                                            Text("\(day.scrollEvents)").foregroundStyle(.green)
+                                        }
+                                        .font(.system(size: 10).bold().monospacedDigit())
+                                    }
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 3)
+                                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 4))
+                                    .offset(y: 30)
+                                }
+
+                            PointMark(x: .value("Date", d), y: .value("Count", day.keystrokes))
+                                .foregroundStyle(.blue)
+                                .symbolSize(30)
+                            PointMark(x: .value("Date", d), y: .value("Count", day.pointerClicks))
+                                .foregroundStyle(.orange)
+                                .symbolSize(30)
+                            PointMark(x: .value("Date", d), y: .value("Count", day.scrollEvents))
+                                .foregroundStyle(.green)
+                                .symbolSize(30)
+                        } else if !compactMode {
+                            PointMark(x: .value("Date", d), y: .value("Count", day.keystrokes))
+                                .foregroundStyle(.blue)
+                                .symbolSize(12)
+                            PointMark(x: .value("Date", d), y: .value("Count", day.pointerClicks))
+                                .foregroundStyle(.orange)
+                                .symbolSize(12)
+                            PointMark(x: .value("Date", d), y: .value("Count", day.scrollEvents))
+                                .foregroundStyle(.green)
+                                .symbolSize(12)
+                        }
                     }
                 }
             }
@@ -1096,10 +1186,11 @@ struct MenuBarView: View {
             .chartXAxis {
                 AxisMarks(values: .automatic) { value in
                     AxisGridLine()
-                    if compactMode {
+                    if isHourly || compactMode {
                         AxisValueLabel() {
                             if let label = value.as(String.self) {
-                                if shouldShowXLabel(label, in: dateLabels) {
+                                let labels = isHourly ? hourlyLabels.map { hourChartLabel($0) } : dateLabels
+                                if shouldShowXLabel(label, in: labels) {
                                     Text(label)
                                         .font(.system(size: 9))
                                 }
@@ -1121,9 +1212,10 @@ struct MenuBarView: View {
                             case .active(let location):
                                 let plotFrame = geo[proxy.plotFrame!]
                                 let x = location.x - plotFrame.origin.x
+                                let labels = isHourly ? hourlyLabels.map { hourChartLabel($0) } : dateLabels
                                 var closest: String?
                                 var closestDist: CGFloat = .infinity
-                                for label in dateLabels {
+                                for label in labels {
                                     if let pos = proxy.position(forX: label) {
                                         let dist = abs(pos - x)
                                         if dist < closestDist {
@@ -1160,32 +1252,59 @@ struct MenuBarView: View {
     // MARK: - Talk Time
 
     private var talkTimeSection: some View {
+        let isHourly = chartRange == .oneDay
         let days = store.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
+        let dayStats = days.first
+        let hourlyLabels = (0..<24).map { String(format: "%02d", $0) }
         let compactMode = chartRange.dayCount > 7
-        let labels = days.map { chartLabel($0.date) }
+        let labels = isHourly ? hourlyLabels.map { hourChartLabel($0) } : days.map { chartLabel($0.date) }
 
         return VStack(alignment: .leading, spacing: 6) {
             Text("Talk Time")
                 .font(.headline)
 
             Chart {
-                ForEach(days) { day in
-                    let d = chartLabel(day.date)
-                    let isHovered = hoveredTalkDate == d
-                    BarMark(
-                        x: .value("Date", d),
-                        y: .value("Duration", day.talkDurationSeconds / 60)
-                    )
-                    .foregroundStyle(isHovered ? .blue.opacity(0.7) : .blue.opacity(0.4))
-                    .cornerRadius(2)
-                    .annotation(position: .top, spacing: 2) {
-                        if isHovered, day.talkDurationSeconds > 0 {
-                            Text(shortDuration(day.talkDurationSeconds))
-                                .font(.system(size: 9).bold().monospacedDigit())
-                                .foregroundStyle(.primary)
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 2)
-                                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 4))
+                if isHourly, let stats = dayStats {
+                    ForEach(hourlyLabels, id: \.self) { hour in
+                        let label = hourChartLabel(hour)
+                        let isHovered = hoveredTalkDate == label
+                        let hourData = stats.perHour[hour] ?? HourlyStats()
+                        BarMark(
+                            x: .value("Hour", label),
+                            y: .value("Duration", hourData.talkDurationSeconds / 60)
+                        )
+                        .foregroundStyle(isHovered ? .blue.opacity(0.7) : .blue.opacity(0.4))
+                        .cornerRadius(2)
+                        .annotation(position: .top, spacing: 2) {
+                            if isHovered, hourData.talkDurationSeconds > 0 {
+                                Text(shortDuration(hourData.talkDurationSeconds))
+                                    .font(.system(size: 9).bold().monospacedDigit())
+                                    .foregroundStyle(.primary)
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 2)
+                                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 4))
+                            }
+                        }
+                    }
+                } else {
+                    ForEach(days) { day in
+                        let d = chartLabel(day.date)
+                        let isHovered = hoveredTalkDate == d
+                        BarMark(
+                            x: .value("Date", d),
+                            y: .value("Duration", day.talkDurationSeconds / 60)
+                        )
+                        .foregroundStyle(isHovered ? .blue.opacity(0.7) : .blue.opacity(0.4))
+                        .cornerRadius(2)
+                        .annotation(position: .top, spacing: 2) {
+                            if isHovered, day.talkDurationSeconds > 0 {
+                                Text(shortDuration(day.talkDurationSeconds))
+                                    .font(.system(size: 9).bold().monospacedDigit())
+                                    .foregroundStyle(.primary)
+                                    .padding(.horizontal, 5)
+                                    .padding(.vertical, 2)
+                                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 4))
+                            }
                         }
                     }
                 }
@@ -1234,7 +1353,7 @@ struct MenuBarView: View {
                     AxisGridLine()
                     AxisValueLabel {
                         if let label = value.as(String.self) {
-                            if !compactMode || shouldShowXLabel(label, in: labels) {
+                            if isHourly || compactMode ? shouldShowXLabel(label, in: labels) : true {
                                 Text(label)
                                     .font(.system(size: 9))
                             }
@@ -1344,10 +1463,25 @@ struct MenuBarView: View {
         return "\(monthStr) \(day)"
     }
 
+    private func hourChartLabel(_ hour: String) -> String {
+        let h = Int(hour) ?? 0
+        if h == 0 { return "12am" }
+        if h < 12 { return "\(h)am" }
+        if h == 12 { return "12pm" }
+        return "\(h - 12)pm"
+    }
+
     /// Only show every Nth x-axis label to avoid crowding
     private func shouldShowXLabel(_ label: String, in allLabels: [String]) -> Bool {
         guard let idx = allLabels.firstIndex(of: label) else { return false }
-        let step = chartRange.dayCount <= 14 ? 2 : 5
+        let step: Int
+        if chartRange == .oneDay {
+            step = 4
+        } else if chartRange.dayCount <= 14 {
+            step = 2
+        } else {
+            step = 5
+        }
         return idx % step == 0 || idx == allLabels.count - 1
     }
 
