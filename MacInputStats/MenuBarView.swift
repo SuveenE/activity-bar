@@ -1413,7 +1413,7 @@ struct MenuBarView: View {
             Spacer()
 
             Button {
-                NSWorkspace.shared.open(URL(string: "https://github.com/SuveenE/mac-input-stats")!)
+                NSWorkspace.shared.open(URL(string: "https://github.com/SuveenE/activity-bar")!)
             } label: {
                 Image("github")
                     .resizable()
