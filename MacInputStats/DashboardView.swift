@@ -53,7 +53,7 @@ struct DashboardView: View {
             StatCard(title: "Keystrokes", value: "\(stats.keystrokes)", icon: "keyboard")
             StatCard(title: "Clicks", value: "\(stats.pointerClicks)", icon: "cursorarrow.click.2")
             StatCard(title: "Scrolls", value: "\(stats.scrollEvents)", icon: "scroll")
-            StatCard(title: "Talk Time", value: stats.formattedTalkTime, icon: "waveform")
+            StatCard(title: "Mic Input", value: stats.formattedTalkTime, icon: "waveform")
         }
     }
 
@@ -218,7 +218,7 @@ struct DashboardView: View {
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
 
-    // MARK: - Talk Time Chart
+    // MARK: - Mic Input Chart
 
     private var talkTimeChart: some View {
         let days = store.recentDays
@@ -226,7 +226,7 @@ struct DashboardView: View {
         let barMaxHeight: CGFloat = 120
 
         return VStack(alignment: .leading, spacing: 8) {
-            Text("Talk Time (7 Days)")
+            Text("Mic Input (7 Days)")
                 .font(.headline)
 
             HStack(alignment: .bottom, spacing: 8) {

@@ -314,7 +314,7 @@ struct MenuBarView: View {
             }
             HStack(spacing: 10) {
                 statCell(icon: "scroll", value: "\(day.scrollEvents)", label: "Scrolls")
-                statCell(icon: isViewingToday && micMonitor.micInUse ? "mic.fill" : "waveform", value: selectedTalkTime, label: "Talk time")
+                statCell(icon: isViewingToday && micMonitor.micInUse ? "mic.fill" : "waveform", value: selectedTalkTime, label: "Mic Input")
             }
 
             if let fact = FunFact.forDay(day) {
@@ -1249,7 +1249,7 @@ struct MenuBarView: View {
         }
     }
 
-    // MARK: - Talk Time
+    // MARK: - Mic Input
 
     private var talkTimeSection: some View {
         let isHourly = chartRange == .oneDay
@@ -1260,7 +1260,7 @@ struct MenuBarView: View {
         let labels = isHourly ? hourlyLabels.map { hourChartLabel($0) } : days.map { chartLabel($0.date) }
 
         return VStack(alignment: .leading, spacing: 6) {
-            Text("Talk Time")
+            Text("Mic Input")
                 .font(.headline)
 
             Chart {

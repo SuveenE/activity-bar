@@ -153,7 +153,7 @@ struct MonthlyStatsView: View {
             statCell(icon: "keyboard", value: formatted(totalKeystrokes), label: "Keystrokes")
             statCell(icon: "cursorarrow.click.2", value: formatted(totalClicks), label: "Clicks")
             statCell(icon: "scroll", value: formatted(totalScrolls), label: "Scrolls")
-            statCell(icon: "waveform", value: AppStats.formatDuration(totalTalkSeconds), label: "Talk Time")
+            statCell(icon: "waveform", value: AppStats.formatDuration(totalTalkSeconds), label: "Mic Input")
         }
     }
 
