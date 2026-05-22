@@ -2,7 +2,7 @@ import AppKit
 import CoreAudio
 import Foundation
 
-/// Tracks talk time as the duration the microphone is active (used by another app).
+/// Tracks mic input as the duration the microphone is active (used by another app).
 /// Monitors ALL input devices so it catches mic usage regardless of which device
 /// macOS routes audio through (AirPods, built-in mic, external mic, etc.).
 @MainActor
