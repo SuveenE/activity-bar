@@ -104,9 +104,19 @@ struct DailyClaudeStats: Codable, Identifiable {
     var executionDuration: TimeInterval = 0
     var wordCount: Int = 0
     var perProject: [String: ClaudeProjectStats] = [:]
+    var perHour: [String: TimeInterval] = [:]
 
     init(date: String) {
         self.date = date
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        date = try container.decode(String.self, forKey: .date)
+        executionDuration = try container.decodeIfPresent(TimeInterval.self, forKey: .executionDuration) ?? 0
+        wordCount = try container.decodeIfPresent(Int.self, forKey: .wordCount) ?? 0
+        perProject = try container.decodeIfPresent([String: ClaudeProjectStats].self, forKey: .perProject) ?? [:]
+        perHour = try container.decodeIfPresent([String: TimeInterval].self, forKey: .perHour) ?? [:]
     }
 
     /// Projects sorted by execution duration descending.

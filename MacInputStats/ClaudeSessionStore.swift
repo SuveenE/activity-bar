@@ -86,12 +86,11 @@ final class ClaudeSessionStore: ObservableObject {
     func days(count: Int, endingDaysAgo offset: Int) -> [DailyClaudeStats] {
         let calendar = Calendar.current
         let endDate = calendar.date(byAdding: .day, value: -offset, to: Date()) ?? Date()
-        let startDate = calendar.date(byAdding: .day, value: -(count - 1), to: endDate) ?? endDate
-        let startKey = StatsStore.dateKey(for: startDate)
-        let endKey = StatsStore.dateKey(for: endDate)
-        return days.values
-            .filter { $0.date >= startKey && $0.date <= endKey }
-            .sorted { $0.date < $1.date }
+        return (0..<count).reversed().map { i in
+            let date = calendar.date(byAdding: .day, value: -i, to: endDate) ?? endDate
+            let key = StatsStore.dateKey(for: date)
+            return days[key] ?? DailyClaudeStats(date: key)
+        }
     }
 
     /// Merged recent events across all sessions, sorted newest first.
@@ -132,9 +131,11 @@ final class ClaudeSessionStore: ObservableObject {
             let isActive = newState == .working || newState == .compacting
             if wasActive && !isActive, let start = session.activeStartedAt {
                 let chunk = Date().timeIntervalSince(start)
+                let hour = StatsStore.hourKey(for: Date())
                 session.activeDuration += chunk
                 session.activeStartedAt = nil
                 days[currentDateKey, default: DailyClaudeStats(date: currentDateKey)].executionDuration += chunk
+                days[currentDateKey]?.perHour[hour, default: 0] += chunk
                 if let project = Self.projectName(for: session.cwd) {
                     days[currentDateKey]?.perProject[project, default: ClaudeProjectStats()].executionDuration += chunk
                 }
@@ -199,9 +200,11 @@ final class ClaudeSessionStore: ObservableObject {
             // Flush any remaining active duration before cleanup
             if var session = sessions[id], let start = session.activeStartedAt {
                 let chunk = Date().timeIntervalSince(start)
+                let hour = StatsStore.hourKey(for: Date())
                 session.activeDuration += chunk
                 session.activeStartedAt = nil
                 days[currentDateKey, default: DailyClaudeStats(date: currentDateKey)].executionDuration += chunk
+                days[currentDateKey]?.perHour[hour, default: 0] += chunk
                 if let project = Self.projectName(for: session.cwd) {
                     days[currentDateKey]?.perProject[project, default: ClaudeProjectStats()].executionDuration += chunk
                 }

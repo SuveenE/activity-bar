@@ -25,6 +25,11 @@ final class StatsStore: ObservableObject {
         return formatter.string(from: date)
     }
 
+    static func hourKey(for date: Date) -> String {
+        let hour = Calendar.current.component(.hour, from: date)
+        return String(format: "%02d", hour)
+    }
+
     func rolloverIfNeeded(now: Date = Date()) {
         let today = Self.dateKey(for: now)
         if currentDateKey != today {
@@ -71,41 +76,48 @@ final class StatsStore: ObservableObject {
     func days(count: Int, endingDaysAgo offset: Int) -> [DailyStats] {
         let calendar = Calendar.current
         let endDate = calendar.date(byAdding: .day, value: -offset, to: Date()) ?? Date()
-        let startDate = calendar.date(byAdding: .day, value: -(count - 1), to: endDate) ?? endDate
-        let startKey = Self.dateKey(for: startDate)
-        let endKey = Self.dateKey(for: endDate)
-        return days.values
-            .filter { $0.date >= startKey && $0.date <= endKey }
-            .sorted { $0.date < $1.date }
+        return (0..<count).reversed().map { i in
+            let date = calendar.date(byAdding: .day, value: -i, to: endDate) ?? endDate
+            let key = Self.dateKey(for: date)
+            return days[key] ?? DailyStats(date: key)
+        }
     }
 
     // MARK: - Increment Methods
 
     func incrementKeystroke(app: String) {
         rolloverIfNeeded()
+        let hour = Self.hourKey(for: Date())
         days[currentDateKey, default: DailyStats(date: currentDateKey)].keystrokes += 1
         days[currentDateKey]?.perApp[app, default: AppStats()].keystrokes += 1
+        days[currentDateKey]?.perHour[hour, default: HourlyStats()].keystrokes += 1
         save()
     }
 
     func incrementPointerClick(app: String) {
         rolloverIfNeeded()
+        let hour = Self.hourKey(for: Date())
         days[currentDateKey, default: DailyStats(date: currentDateKey)].pointerClicks += 1
         days[currentDateKey]?.perApp[app, default: AppStats()].pointerClicks += 1
+        days[currentDateKey]?.perHour[hour, default: HourlyStats()].pointerClicks += 1
         save()
     }
 
     func incrementScroll(app: String) {
         rolloverIfNeeded()
+        let hour = Self.hourKey(for: Date())
         days[currentDateKey, default: DailyStats(date: currentDateKey)].scrollEvents += 1
         days[currentDateKey]?.perApp[app, default: AppStats()].scrollEvents += 1
+        days[currentDateKey]?.perHour[hour, default: HourlyStats()].scrollEvents += 1
         save()
     }
 
     func addTalkDuration(_ seconds: Double, app: String) {
         rolloverIfNeeded()
+        let hour = Self.hourKey(for: Date())
         days[currentDateKey, default: DailyStats(date: currentDateKey)].talkDurationSeconds += seconds
         days[currentDateKey]?.perApp[app, default: AppStats()].talkDurationSeconds += seconds
+        days[currentDateKey]?.perHour[hour, default: HourlyStats()].talkDurationSeconds += seconds
         save()
     }
 
