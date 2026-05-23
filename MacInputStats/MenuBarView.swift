@@ -796,7 +796,8 @@ struct MenuBarView: View {
         let claudeDays = claudeStore.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
         let cursorDays = cursorStore.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
         let codexDays = codexStore.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
-        let hourlyLabels = (0..<24).map { String(format: "%02d", $0) }
+        let currentHourLimit = isHourly && chartDayOffset == 0 ? Calendar.current.component(.hour, from: Date()) + 1 : 24
+        let hourlyLabels = (0..<currentHourLimit).map { String(format: "%02d", $0) }
 
         // Merge Claude + Cursor + Codex data by date
         var mergedByDate: [String: (claude: DailyClaudeStats?, cursor: DailyClaudeStats?, codex: DailyClaudeStats?)] = [:]
@@ -1049,7 +1050,8 @@ struct MenuBarView: View {
         let isHourly = chartRange == .oneDay
         let days = store.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
         let dayStats = days.first
-        let hourlyLabels = (0..<24).map { String(format: "%02d", $0) }
+        let currentHourLimit = isHourly && chartDayOffset == 0 ? Calendar.current.component(.hour, from: Date()) + 1 : 24
+        let hourlyLabels = (0..<currentHourLimit).map { String(format: "%02d", $0) }
         let compactMode = chartRange.dayCount > 7
         let dateLabels = isHourly ? hourlyLabels : days.map { chartLabel($0.date) }
 
@@ -1255,7 +1257,8 @@ struct MenuBarView: View {
         let isHourly = chartRange == .oneDay
         let days = store.days(count: chartRange.dayCount, endingDaysAgo: chartDayOffset)
         let dayStats = days.first
-        let hourlyLabels = (0..<24).map { String(format: "%02d", $0) }
+        let currentHourLimit = isHourly && chartDayOffset == 0 ? Calendar.current.component(.hour, from: Date()) + 1 : 24
+        let hourlyLabels = (0..<currentHourLimit).map { String(format: "%02d", $0) }
         let compactMode = chartRange.dayCount > 7
         let labels = isHourly ? hourlyLabels.map { hourChartLabel($0) } : days.map { chartLabel($0.date) }
 
