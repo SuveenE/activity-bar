@@ -18,6 +18,9 @@ struct SettingsView: View {
     @AppStorage("showCategories") private var showCategories = true
     @AppStorage("showTrends") private var showTrends = true
 
+    private let settingsAccent = Color(red: 0.0, green: 0.48, blue: 1.0)
+    private let settingsAccentOutline = Color.black.opacity(0.75)
+
     var body: some View {
         VStack(spacing: 12) {
             header
@@ -44,8 +47,14 @@ struct SettingsView: View {
 
     private var categoriesBlock: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Categories")
-                .font(.headline)
+            HStack {
+                Text("Categories")
+                    .font(.headline)
+                Spacer()
+                if !isEditing {
+                    addButton
+                }
+            }
 
             if isEditing {
                 categoryEditor(existingId: editingCategoryId)
@@ -55,7 +64,6 @@ struct SettingsView: View {
                     .foregroundStyle(.primary.opacity(0.55))
 
                 categoryList
-                addButton
             }
         }
     }
@@ -87,7 +95,8 @@ struct SettingsView: View {
             HStack(spacing: 8) {
                 Image(systemName: isOn.wrappedValue ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 13))
-                    .foregroundStyle(isOn.wrappedValue ? .blue : .primary.opacity(0.3))
+                    .foregroundStyle(isOn.wrappedValue ? settingsAccent : .primary.opacity(0.3))
+                    .shadow(color: isOn.wrappedValue ? settingsAccentOutline : .clear, radius: 0.8)
                 Image(systemName: icon)
                     .font(.system(size: 11))
                     .foregroundStyle(.primary.opacity(0.55))
@@ -156,7 +165,8 @@ struct SettingsView: View {
             HStack {
                 Image(systemName: "folder.fill")
                     .font(.system(size: 11))
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(settingsAccent)
+                    .shadow(color: settingsAccentOutline, radius: 0.8)
                 Text(category.name)
                     .font(.body.weight(.medium))
                     .lineLimit(1)
@@ -250,7 +260,8 @@ struct SettingsView: View {
             HStack(spacing: 8) {
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 13))
-                    .foregroundStyle(isSelected ? .blue : .primary.opacity(0.3))
+                    .foregroundStyle(isSelected ? settingsAccent : .primary.opacity(0.3))
+                    .shadow(color: isSelected ? settingsAccentOutline : .clear, radius: 0.8)
                 Text(app)
                     .font(.body)
                     .foregroundStyle(.primary.opacity(isAssignedElsewhere ? 0.3 : 1))
@@ -284,7 +295,8 @@ struct SettingsView: View {
                 saveCategory(existingId: existingId)
             }
             .buttonStyle(.plain)
-            .foregroundStyle(.blue)
+            .foregroundStyle(settingsAccent)
+            .shadow(color: settingsAccentOutline, radius: 0.8)
             .font(.subheadline.weight(.medium))
             .disabled(draftName.trimmingCharacters(in: .whitespaces).isEmpty)
         }
@@ -298,15 +310,13 @@ struct SettingsView: View {
             draftApps = []
             isAddingNew = true
         } label: {
-            HStack(spacing: 4) {
-                Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 12))
-                Text("Add Category")
-                    .font(.subheadline.weight(.medium))
-            }
-            .foregroundStyle(.blue)
+            Image(systemName: "plus.circle.fill")
+                .font(.system(size: 13))
+            .foregroundStyle(settingsAccent)
+            .shadow(color: settingsAccentOutline, radius: 0.8)
         }
         .buttonStyle(.plain)
+        .help("Add Category")
     }
 
     // MARK: - Permissions
