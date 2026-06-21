@@ -1,3 +1,4 @@
+import ServiceManagement
 import SwiftUI
 
 struct SettingsView: View {
@@ -27,6 +28,8 @@ struct SettingsView: View {
             categoriesBlock
             Divider().padding(.horizontal, 0)
             customizeBlock
+            Divider().padding(.horizontal, 0)
+            launchAtLoginBlock
             Divider().padding(.horizontal, 0)
             permissionsLink
         }
@@ -86,6 +89,38 @@ struct SettingsView: View {
                 customizeToggleRow("Trends", icon: "chart.xyaxis.line", isOn: $showTrends)
             }
         }
+    }
+
+    private var launchAtLoginBlock: some View {
+        let isEnabled = SMAppService.mainApp.status == .enabled
+        return Button {
+            do {
+                if isEnabled {
+                    try SMAppService.mainApp.unregister()
+                } else {
+                    try SMAppService.mainApp.register()
+                }
+            } catch {}
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: isEnabled ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 13))
+                    .foregroundStyle(isEnabled ? settingsAccent : .primary.opacity(0.3))
+                    .shadow(color: isEnabled ? settingsAccentOutline : .clear, radius: 0.8)
+                Image(systemName: "arrow.clockwise")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.primary.opacity(0.55))
+                    .frame(width: 16)
+                Text("Launch at Login")
+                    .font(.body)
+                    .foregroundStyle(.primary)
+                Spacer()
+            }
+            .padding(.vertical, 6)
+            .padding(.horizontal, 8)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     private func customizeToggleRow(_ label: String, icon: String, isOn: Binding<Bool>) -> some View {
