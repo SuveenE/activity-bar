@@ -168,6 +168,8 @@ struct MonthlyStatsView: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text(value)
                     .font(.system(size: 14, weight: .semibold).monospacedDigit())
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                 Text(label)
                     .font(.system(size: 10))
                     .foregroundStyle(.primary.opacity(0.5))
